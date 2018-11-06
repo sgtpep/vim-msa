@@ -1,2 +1,7 @@
-remove split borders x2
-try..catch: show error
+format support https://en.wikipedia.org/wiki/FASTA_format
+  file comments
+dynamic split width
+BufWriteCmd https://vi.stackexchange.com/a/697
+sync lines
+  insert
+  delete
