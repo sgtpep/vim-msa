@@ -1,7 +1,6 @@
-independent from set splitright
-close other split on closing one
 scroll in sync
 remove split borders
+:help :help
 read_fasta
   try..catch
   on error: fallback to text, show error
