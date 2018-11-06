@@ -4,10 +4,24 @@ function s:main()
 endfunction
 
 function s:read_fasta(path)
+  let comments = []
+  let sequences = []
   for line in readfile(a:path)
     if line !~ '^\s*$'
+      if line =~ '^[>;]'
+        call add(comments, substitute(line, '^[>;]\s*', '', ''))
+        call add(sequences, '')
+      else
+        let sequences[len(comments) - 1] .= line
+      endif
     endif
   endfor
+  let id = win_getid()
+  call win_gotoid(1000)
+  call setline(1, sequences)
+  call win_gotoid(1001)
+  call setline(1, comments)
+  call win_gotoid(id)
 endfunction
 
 function s:setup_splits()
