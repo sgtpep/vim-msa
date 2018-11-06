@@ -18,8 +18,12 @@ function s:read_fasta(path)
   endfor
   let id = win_getid()
   call win_gotoid(1000)
+  setlocal nowrap scrollbind
+  %delete _
   call setline(1, sequences)
   call win_gotoid(1001)
+  setlocal nowrap scrollbind
+  %delete _
   call setline(1, comments)
   call win_gotoid(id)
 endfunction
@@ -27,7 +31,6 @@ endfunction
 function s:setup_splits()
   vnew
   vertical resize 10
-  windo setlocal nowrap scrollbind
   autocmd VimEnter * wincmd l
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
