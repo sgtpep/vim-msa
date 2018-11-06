@@ -25,10 +25,11 @@ function s:read_fasta(path)
 endfunction
 
 function s:setup_splits()
-  vsplit
+  vnew
   vertical resize 10
+  windo setlocal nowrap scrollbind
   autocmd VimEnter * wincmd l
-  autocmd WinEnter * if winnr('$') < 2 | quit! | endif
+  autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
 call s:main()
