@@ -1,5 +1,2 @@
-remove split borders
-read_fasta
-  :help :help
-  try..catch
-  on error: fallback to text, show error
+remove split borders x2
+try..catch: show error
