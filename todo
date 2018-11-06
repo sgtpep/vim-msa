@@ -1,6 +1,7 @@
-scroll in sync
+update all views on read
+
 remove split borders
-:help :help
 read_fasta
+  :help :help
   try..catch
   on error: fallback to text, show error
