@@ -26,6 +26,8 @@ endfunction
 function s:setup_splits()
   autocmd VimEnter * wincmd l
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
+  highlight VertSplit cterm=NONE gui=NONE term=NONE
+  set fillchars+=vert:│
   vnew
 endfunction
 
