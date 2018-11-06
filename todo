@@ -1,7 +1,10 @@
 format support https://en.wikipedia.org/wiki/FASTA_format
   file comments
 dynamic split width
+  space
+  max 10
 BufWriteCmd https://vi.stackexchange.com/a/697
+  support file creation
 sync lines
   insert
   delete
