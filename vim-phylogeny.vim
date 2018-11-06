@@ -34,7 +34,8 @@ endfunction
 
 function s:update_window(id, lines)
   call win_gotoid(a:id)
-  setlocal nowrap scrollbind
+  setlocal nowrap
+  setlocal scrollbind
   %delete _
   call setline(1, a:lines)
 endfunction
