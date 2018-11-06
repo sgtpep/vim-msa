@@ -14,6 +14,7 @@ function s:setup_splits()
   vsplit
   vertical resize 10
   autocmd VimEnter * wincmd l
+  autocmd WinEnter * if winnr('$') < 2 | quit! | endif
 endfunction
 
 call s:main()
