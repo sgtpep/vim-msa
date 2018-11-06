@@ -19,14 +19,14 @@ function s:read_fasta(path)
   let id = win_getid()
   call s:update_window(1000, sequences)
   call s:update_window(1001, comments)
+  vertical resize 10
   call win_gotoid(id)
 endfunction
 
 function s:setup_splits()
-  vnew
-  vertical resize 10
   autocmd VimEnter * wincmd l
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
+  vnew
 endfunction
 
 function s:update_window(id, lines)
