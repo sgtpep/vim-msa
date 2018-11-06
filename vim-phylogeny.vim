@@ -28,6 +28,7 @@ function s:setup_splits()
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
   highlight VertSplit cterm=NONE gui=NONE term=NONE
   set fillchars+=vert:│
+  set laststatus=0
   vnew
 endfunction
 
