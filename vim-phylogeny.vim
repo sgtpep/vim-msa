@@ -1,6 +1,6 @@
 function s:main()
   call s:setup_splits()
-  autocmd BufReadCmd * call s:read_fasta(expand('%'))
+  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_fasta(expand('%'))
 endfunction
 
 function s:read_fasta(path)
