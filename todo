@@ -1,0 +1,7 @@
+independent from set splitright
+close other split on closing one
+scroll in sync
+remove split borders
+read_fasta
+  try..catch
+  on error: fallback to text, show error

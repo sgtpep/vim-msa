@@ -1,0 +1,11 @@
+dynamic split width
+BufWriteCmd https://vi.stackexchange.com/a/697
+format support https://en.wikipedia.org/wiki/FASTA_format
+  file comments
+example
+extensions https://en.wikipedia.org/wiki/FASTA_format
+highlight syntax
+readme
+  https://github.com/viklund/bio-vim#install
+github
+publish in plugin repositories
