@@ -1,2 +1,2 @@
 #!/bin/sh
-exec vim --cmd "source $(/usr/bin/env printf %q "${0%/*}")/vim-phylogeny.vim" "$@"
+exec vim --cmd 'set runtimepath+='"$(/usr/bin/env printf %q "${0%/*}")"' | runtime vim-phylogeny.vim' "$@"
