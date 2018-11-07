@@ -1,5 +1,10 @@
 write message
-ZZ
+
+more functional
+  edit_comment
+  read_fasta
+  update_names
+  write_fasta
 
 call s:main() if sourced
 try file creation
