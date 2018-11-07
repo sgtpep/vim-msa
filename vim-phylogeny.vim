@@ -20,7 +20,7 @@ function s:main()
   autocmd VimEnter * nmap <silent> gc :call <SID>edit_comment()<CR>
 endfunction
 
-function s:on_file_read(filetype, comments, sequences)
+function s:on_read_file(filetype, comments, sequences)
   let &l:filetype = a:filetype
   let s:comments = a:comments
   call s:update_names()
@@ -41,7 +41,7 @@ function s:read_fasta()
       endif
     endif
   endfor
-  call s:on_file_read('fasta', comments, sequences)
+  call s:on_read_file('fasta', comments, sequences)
 endfunction
 
 function s:setup_windows()
