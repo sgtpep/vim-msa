@@ -24,6 +24,7 @@ function s:setup_splits()
   set fillchars+=vert:│
   set laststatus=0
   vnew
+  silent file [Comments]
   autocmd VimEnter * wincmd l
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
