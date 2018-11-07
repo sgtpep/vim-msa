@@ -20,6 +20,13 @@ function s:main()
   autocmd VimEnter * nmap <silent> gc :call <SID>edit_comment()<CR>
 endfunction
 
+function s:on_filetype_read(filetype, sequences)
+  let &l:filetype = a:filetype
+  call s:update_names()
+  call s:update_window(1000, a:sequences)
+  execute 'autocmd BufWriteCmd <buffer> call s:write_' . a:filetype . '()'
+endfunction
+
 function s:read_fasta()
   let s:comments = []
   let sequences = []
@@ -33,10 +40,7 @@ function s:read_fasta()
       endif
     endif
   endfor
-  call s:update_names()
-  call s:update_window(1000, sequences)
-  setlocal filetype=fasta
-  autocmd BufWriteCmd <buffer> call s:write_fasta()
+  call s:on_filetype_read('fasta', sequences)
 endfunction
 
 function s:setup_windows()
