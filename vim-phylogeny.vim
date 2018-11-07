@@ -1,5 +1,5 @@
 function s:main()
-  call s:setup_splits()
+  call s:setup_windows()
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_fasta()
 endfunction
 
@@ -19,7 +19,7 @@ function s:read_fasta()
   call s:update_windows(sequences, names)
 endfunction
 
-function s:setup_splits()
+function s:setup_windows()
   highlight VertSplit cterm=NONE gui=NONE term=NONE
   set fillchars+=vert:│
   set laststatus=0
