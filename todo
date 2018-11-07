@@ -1,5 +1,3 @@
-call s:main() if sourced
-try file creation
 disable undo
 extract functions
 format

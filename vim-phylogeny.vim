@@ -33,16 +33,18 @@ endfunction
 function s:read_fasta(path)
   let comments = []
   let sequences = []
-  for line in readfile(a:path)
-    if line !~ '^\s*$'
-      if line =~ '^[>;]'
-        call add(comments, substitute(line, '^[>;]\s*', '', ''))
-        call add(sequences, '')
-      else
-        let sequences[len(comments) - 1] .= line
+  if filereadable(a:path)
+    for line in readfile(a:path)
+      if line !~ '^\s*$'
+        if line =~ '^[>;]'
+          call add(comments, substitute(line, '^[>;]\s*', '', ''))
+          call add(sequences, '')
+        else
+          let sequences[len(comments) - 1] .= line
+        endif
       endif
-    endif
-  endfor
+    endfor
+  endif
   call s:on_read_file('fasta', comments, sequences)
 endfunction
 
