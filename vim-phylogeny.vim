@@ -57,7 +57,7 @@ function s:setup_windows()
 endfunction
 
 function s:update_names()
-  call s:update_window(1001, map(s:comments, 'split(v:val, "\s", 1)[0]'))
+  call s:update_window(1001, map(copy(s:comments), 'split(v:val, "", 1)[0]'))
 endfunction
 
 function s:update_window(id, lines)
