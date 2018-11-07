@@ -20,12 +20,12 @@ function s:read_fasta()
 endfunction
 
 function s:setup_splits()
-  autocmd VimEnter * wincmd l
-  autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
   highlight VertSplit cterm=NONE gui=NONE term=NONE
   set fillchars+=vert:│
   set laststatus=0
   vnew
+  autocmd VimEnter * wincmd l
+  autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
 function s:update_window(id, lines)
