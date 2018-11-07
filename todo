@@ -14,5 +14,3 @@ sync 3 lists
   delete line
   lines in insert mode
 cut comments up to space
-dynamic split width
-  max width or 10

@@ -64,7 +64,6 @@ function s:update_window(id, lines)
   if a:id == 1001
     setlocal modifiable
     setlocal readonly
-    vertical resize 10
   endif
   %delete _
   call setline(1, a:lines)
