@@ -1,10 +1,15 @@
 function s:edit_comment()
   let index = line('.') - 1
+  let view = winsaveview()
   silent split `=tempname()`
   resize 3
   setlocal nobuflisted
   setlocal statusline=[Comment]
   call setline(1, s:comments[index])
+  let id = win_getid()
+  call win_gotoid(1000)
+  call winrestview(view)
+  call win_gotoid(id)
   let b:index = index
   autocmd BufWriteCmd <buffer> let s:comments[b:index] = join(getline(0, '$'), ' ') | call s:update_names() | close!
 endfunction

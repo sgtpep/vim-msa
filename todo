@@ -1,6 +1,3 @@
-do not scroll on comment
-restore scroll after comment
-
 BufWriteCmd https://vi.stackexchange.com/a/697
   extensions
   support file creation
