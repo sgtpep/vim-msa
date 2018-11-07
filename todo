@@ -2,6 +2,8 @@ BufWriteCmd
   split by 70
 try file creation
 
+disable undo
+extract functions
 format
   Subsequent lines starting with a semicolon would be ignored by software
   Anything other than a valid character would be ignored (including spaces, tabulators, asterisks, etc...)
