@@ -78,12 +78,14 @@ function s:update_window(id, lines)
 endfunction
 
 function s:write_fasta()
-  let lines = []
+  call writefile([], expand('%'))
   for index in range(0, len(s:comments) - 1)
-    call add(lines, '>' . s:comments[index])
-    call add(lines, getline(index + 1))
+    call writefile(['>' . s:comments[index]], expand('%'), 'a')
+    let sequence = getline(index + 1)
+    for index in range(0, len(sequence) - 1, 70)
+      call writefile([sequence[index:index + 70 - 1]], expand('%'), 'a')
+    endfor
   endfor
-  call writefile(lines, expand('%'))
 endfunction
 
 call s:main()
