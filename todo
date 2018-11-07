@@ -1,7 +1,8 @@
-BufWriteCmd
-  split by 70
-try file creation
+write message
+ZZ
 
+call s:main() if sourced
+try file creation
 disable undo
 extract functions
 format
