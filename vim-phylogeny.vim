@@ -24,13 +24,17 @@ function s:setup_windows()
   set fillchars+=vert:│
   set laststatus=0
   vnew
+  setlocal nobuflisted
+  setlocal winfixwidth
   silent file [Comments]
+  vertical resize 10
   autocmd VimEnter * wincmd l
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
 function s:update_window(id, lines)
   call win_gotoid(a:id)
+  setlocal modifiable
   setlocal nowrap
   setlocal scrollbind
   %delete _
@@ -42,6 +46,7 @@ function s:update_windows(sequences, names)
   call s:update_window(1000, a:sequences)
   call s:update_window(1001, a:names)
   setlocal nomodifiable
+  setlocal readonly
   vertical resize 10
   call win_gotoid(id)
 endfunction
