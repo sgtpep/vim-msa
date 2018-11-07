@@ -28,6 +28,11 @@ function s:on_read_file(filetype, comments, sequences)
   execute 'autocmd BufWriteCmd <buffer> call s:write_' . a:filetype . '()'
 endfunction
 
+function s:on_write_file(path)
+  setlocal nomodified
+  echomsg '"' . a:path . '" written'
+endfunction
+
 function s:read_fasta()
   let comments = []
   let sequences = []
@@ -87,7 +92,7 @@ function s:write_fasta()
       call writefile([sequence[index:index + 70 - 1]], expand('%'), 'a')
     endfor
   endfor
-  setlocal nomodified
+  call s:on_write_file(expand('%'))
 endfunction
 
 call s:main()
