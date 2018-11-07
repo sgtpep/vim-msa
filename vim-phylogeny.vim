@@ -5,11 +5,14 @@ endfunction
 
 function s:read_fasta()
   let names = []
+  let s:comments = []
   let sequences = []
   for line in readfile(expand('%'))
     if line !~ '^\s*$'
       if line =~ '^[>;]'
-        call add(names, substitute(line, '^[>;]\s*', '', ''))
+        let comment = substitute(line, '^[>;]\s*', '', '')
+        call add(names, split(comment, '\s', 1)[0])
+        call add(s:comments, comment)
         call add(sequences, '')
       else
         let sequences[len(names) - 1] .= line
