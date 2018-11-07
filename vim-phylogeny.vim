@@ -34,15 +34,19 @@ function s:read_fasta(path)
   let comments = []
   let sequences = []
   if filereadable(a:path)
+    let prev_line = ''
     for line in readfile(a:path)
       if line !~ '^\s*$'
         if line =~ '^[>;]'
-          call add(comments, substitute(line, '^[>;]\s*', '', ''))
-          call add(sequences, '')
+          if line !~ '^;' || prev_line !~ '^[>;]'
+            call add(comments, substitute(line, '^[>;]\s*', '', ''))
+            call add(sequences, '')
+          endif
         else
-          let sequences[len(comments) - 1] .= line
+          let sequences[len(comments) - 1] .= substitute(line, '\*$', '', '')
         endif
       endif
+      let prev_line = line
     endfor
   endif
   call s:on_read_file('fasta', comments, sequences)
