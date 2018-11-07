@@ -1,8 +1,9 @@
-stdin/stdout
-  ${TMPDIR-/tmp}
-edit comments
+chars
+  space -> -
+  lower case -> upper case
+  disallow invalid chars
+highlight syntax
 readme
   https://github.com/viklund/bio-vim#install
 github
 publish in plugin repositories
-highlight syntax
