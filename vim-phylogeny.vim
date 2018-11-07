@@ -75,7 +75,12 @@ function s:update_window(id, lines)
 endfunction
 
 function s:write_fasta()
-  echo 'TODO'
+  let lines = []
+  for index in range(0, len(s:comments) - 1)
+    call add(lines, '>' . s:comments[index])
+    call add(lines, getline(index + 1))
+  endfor
+  call writefile(lines, expand('%'))
 endfunction
 
 call s:main()
