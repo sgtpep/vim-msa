@@ -41,6 +41,7 @@ function s:update_windows(sequences, names)
   let id = win_getid()
   call s:update_window(1000, a:sequences)
   call s:update_window(1001, a:names)
+  setlocal nomodifiable
   vertical resize 10
   call win_gotoid(id)
 endfunction
