@@ -87,6 +87,7 @@ function s:write_fasta()
       call writefile([sequence[index:index + 70 - 1]], expand('%'), 'a')
     endfor
   endfor
+  setlocal nomodified
 endfunction
 
 call s:main()
