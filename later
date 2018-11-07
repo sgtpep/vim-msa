@@ -1,3 +1,8 @@
+sync 3 lists
+  append line
+  prepend line
+  delete line
+  lines in insert mode
 chars
   space -> -
   lower case -> upper case

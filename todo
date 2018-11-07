@@ -1,5 +1,3 @@
-write message
-
 more functional
   edit_comment
   read_fasta
@@ -16,9 +14,3 @@ format
   end the sequence with an "*" (asterisk) character
 stdin/stdout
   ${TMPDIR-/tmp}
-sync 3 lists
-  append line
-  prepend line
-  delete line
-  lines in insert mode
-cut comments up to space
