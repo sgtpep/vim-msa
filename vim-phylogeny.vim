@@ -9,7 +9,7 @@ function s:edit_comment(index)
   call winrestview(view)
   call win_gotoid(id)
   let b:index = a:index
-  autocmd BufWriteCmd <buffer> let s:comments[b:index] = join(getline(0, '$'), ' ') | call s:update_comments(s:comments) | close!
+  autocmd BufWriteCmd <buffer> call s:update_comment(b:index, join(getline(0, '$'), ' ')) | close!
 endfunction
 
 function s:main()
@@ -67,11 +67,16 @@ function s:setup_windows()
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
-function s:update_comments(comments)
-  let s:comments = a:comments
+function s:update_comment(index, comment)
+  let s:comments[a:index] = a:comment
+  call s:update_comments(s:comments)
   let id = s:select_window(1000)
   setlocal modified
   call win_gotoid(id)
+endfunction
+
+function s:update_comments(comments)
+  let s:comments = a:comments
   call s:update_window(1001, map(copy(a:comments), 'split(v:val, "", 1)[0]'))
 endfunction
 
