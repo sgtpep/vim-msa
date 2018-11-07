@@ -1,31 +1,28 @@
-function s:edit_comment()
-  let index = line('.') - 1
+function s:edit_comment(index)
   let view = winsaveview()
   silent split `=tempname()`
   resize 3
   setlocal nobuflisted
   setlocal statusline=[Comment]
-  call setline(1, s:comments[index])
-  let id = win_getid()
-  call win_gotoid(1000)
+  call setline(1, s:comments[a:index])
+  let id = s:select_window(1000)
   call winrestview(view)
   call win_gotoid(id)
-  let b:index = index
-  autocmd BufWriteCmd <buffer> let s:comments[b:index] = join(getline(0, '$'), ' ') | call s:update_names() | close!
+  let b:index = a:index
+  autocmd BufWriteCmd <buffer> let s:comments[b:index] = join(getline(0, '$'), ' ') | call s:update_comments(s:comments) | close!
 endfunction
 
 function s:main()
   call s:setup_windows()
-  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_fasta()
-  autocmd VimEnter * nmap <silent> gc :call <SID>edit_comment()<CR>
+  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_fasta(expand('%'))
+  autocmd VimEnter * nmap <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
 endfunction
 
 function s:on_read_file(filetype, comments, sequences)
   let &l:filetype = a:filetype
-  let s:comments = a:comments
-  call s:update_names()
+  call s:update_comments(a:comments)
   call s:update_window(1000, a:sequences)
-  execute 'autocmd BufWriteCmd <buffer> call s:write_' . a:filetype . '()'
+  execute 'autocmd BufWriteCmd <buffer> call s:write_' . a:filetype . '(expand("%"), s:comments)'
 endfunction
 
 function s:on_write_file(path)
@@ -33,10 +30,10 @@ function s:on_write_file(path)
   echomsg '"' . a:path . '" written'
 endfunction
 
-function s:read_fasta()
+function s:read_fasta(path)
   let comments = []
   let sequences = []
-  for line in readfile(expand('%'))
+  for line in readfile(a:path)
     if line !~ '^\s*$'
       if line =~ '^[>;]'
         call add(comments, substitute(line, '^[>;]\s*', '', ''))
@@ -47,6 +44,12 @@ function s:read_fasta()
     endif
   endfor
   call s:on_read_file('fasta', comments, sequences)
+endfunction
+
+function s:select_window(id)
+  let id = win_getid()
+  call win_gotoid(a:id)
+  return id
 endfunction
 
 function s:setup_windows()
@@ -62,13 +65,16 @@ function s:setup_windows()
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
-function s:update_names()
-  call s:update_window(1001, map(copy(s:comments), 'split(v:val, "", 1)[0]'))
+function s:update_comments(comments)
+  let s:comments = a:comments
+  let id = s:select_window(1000)
+  setlocal modified
+  call win_gotoid(id)
+  call s:update_window(1001, map(copy(a:comments), 'split(v:val, "", 1)[0]'))
 endfunction
 
 function s:update_window(id, lines)
-  let id = win_getid()
-  call win_gotoid(a:id)
+  let id = s:select_window(a:id)
   setlocal nowrap
   setlocal scrollbind
   if a:id == 1001
@@ -83,16 +89,16 @@ function s:update_window(id, lines)
   call win_gotoid(id)
 endfunction
 
-function s:write_fasta()
-  call writefile([], expand('%'))
-  for index in range(0, len(s:comments) - 1)
-    call writefile(['>' . s:comments[index]], expand('%'), 'a')
+function s:write_fasta(path, comments)
+  call writefile([], a:path)
+  for index in range(0, len(a:comments) - 1)
+    call writefile(['>' . a:comments[index]], expand('%'), 'a')
     let sequence = getline(index + 1)
     for index in range(0, len(sequence) - 1, 70)
-      call writefile([sequence[index:index + 70 - 1]], expand('%'), 'a')
+      call writefile([sequence[index:index + 70 - 1]], a:path, 'a')
     endfor
   endfor
-  call s:on_write_file(expand('%'))
+  call s:on_write_file(a:path)
 endfunction
 
 call s:main()
