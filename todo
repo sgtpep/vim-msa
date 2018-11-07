@@ -1,3 +1,4 @@
+file '[Comments]'
 readonly 1001
 format
   Subsequent lines starting with a semicolon would be ignored by software
