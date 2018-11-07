@@ -3,6 +3,7 @@ chars
   lower case -> upper case
   disallow invalid chars
 highlight syntax
+settings
 readme
   https://github.com/viklund/bio-vim#install
 github
