@@ -89,8 +89,10 @@ function s:update_window(id, lines)
   setlocal nowrap
   setlocal scrollbind
   if a:id == 1000
+    setlocal backspace-=eol
     let undo_levels = &undolevels
     setlocal undolevels=-1
+    imap <buffer> <CR> <Nop>
   elseif a:id == 1001
     setlocal modifiable
     setlocal readonly

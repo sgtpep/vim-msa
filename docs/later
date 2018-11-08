@@ -2,7 +2,6 @@ sync 3 lists
   append line
   prepend line
   delete line
-  lines in insert mode
 chars
   InsertCharPre
   space -> -
