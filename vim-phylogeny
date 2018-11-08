@@ -1,12 +1,11 @@
 #!/bin/sh
 set -eu
-[ "$#" != 0 ] || stdin=1
 set -- --cmd 'set runtimepath+='"$(/usr/bin/env printf %q "${0%/*}")"' | runtime vim-phylogeny.vim' "$@"
-if [ "${stdin-}" ]; then
+if [ -t 0 ]; then
+  exec vim "$@"
+else
   path=${TMPDIR-/tmp}/vim-phylogeny.fasta
   cat > "$path"
   vim "$@" "$path" < /dev/tty > /dev/tty
   cat "$path"
-else
-  exec vim "$@"
 fi
