@@ -1,3 +1,13 @@
+readme
+  The VIM-based multiple sequence alignment (MSA) editor.
+  authors, copyright, license
+  usage
+    vim-msa /path/file.fasta
+    cat /path/file.fasta | vim-msa
+    edit comments
+  installation
+copywright in a script
+
 sync 3 lists
   o
   O
