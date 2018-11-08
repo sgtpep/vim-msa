@@ -15,7 +15,7 @@ endfunction
 function s:main()
   call s:setup_windows()
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_fasta(expand('%'))
-  autocmd VimEnter * nmap <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
+  autocmd VimEnter * nnoremap <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
 endfunction
 
 function s:on_read_file(filetype, comments, sequences)
@@ -92,7 +92,7 @@ function s:update_window(id, lines)
     setlocal backspace-=eol
     let undo_levels = &undolevels
     setlocal undolevels=-1
-    imap <buffer> <CR> <Nop>
+    inoremap <buffer> <CR> <Nop>
   elseif a:id == 1001
     setlocal modifiable
     setlocal readonly
