@@ -1,9 +1,4 @@
-readme
-  usage
-    vim-msa /path/file.fasta
-    cat /path/file.fasta | vim-msa
-    edit comments
-  installation
+remove /tmp/vim-fasta.vim
 
 sync 3 lists
   o
