@@ -1,9 +1,5 @@
-sync 3 lists
-  append line
-  prepend line
-  delete line
 chars
-  InsertCharPre
+  InsertCharPre, :noreabbrev
   space -> -
   lower case -> upper case
   disallow invalid chars
