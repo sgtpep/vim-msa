@@ -23,6 +23,15 @@ function s:on_read_file(filetype, comments, sequences)
   call s:update_comments(a:comments)
   call s:update_window(1000, a:sequences)
   execute 'autocmd BufWriteCmd <buffer> call s:write_' . a:filetype . '(expand("%"), s:comments)'
+  let b:lines = line('$')
+  autocmd TextChanged <buffer> call s:on_text_changed()
+endfunction
+
+function s:on_text_changed()
+  if b:lines != line('$')
+    " TODO
+    let b:lines = line('$')
+  endif
 endfunction
 
 function s:on_write_file(path)
