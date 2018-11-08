@@ -4,7 +4,7 @@ set -- --cmd 'set runtimepath+='"$(/usr/bin/env printf %q "${0%/*}")"' | runtime
 if [ -t 0 ]; then
   exec vim "$@"
 else
-  path=${TMPDIR-/tmp}/vim-msa.fasta
+  path=${TMPDIR-/tmp}/${0##*/}.fasta
   cat > "$path"
   vim "$@" "$path" < /dev/tty > /dev/tty
   cat "$path"
