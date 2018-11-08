@@ -40,7 +40,3 @@ To edit a comment to the sequence move the cursor to its line and press `gc`, ed
 The project is released under the General Public License (GPL), version 3.
 
 Copyright © 2018, Danil Semelenov, Stas Malavin.
-
-```
-
-```
