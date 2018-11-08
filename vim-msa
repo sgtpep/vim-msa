@@ -143,4 +143,5 @@ else
   cat > "$path".fasta
   vim "$@" "$path".fasta < /dev/tty > /dev/tty
   cat "$path".fasta
+  rm "$path".fasta
 fi
