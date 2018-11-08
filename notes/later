@@ -5,12 +5,4 @@ chars
   disallow invalid chars
 highlight syntax
 settings
-github description
-readme
-  description
-  installation
-  usage
-    vim-philogeny example.fasta
-    cat example.fasta | vim-philogeny
-    vim-philogeny
-    edit comments
+screenshots
