@@ -10,6 +10,10 @@ chars
 highlight syntax
 settings
 readme
-  https://github.com/viklund/bio-vim#install
+  installation
+  usage
+    vim-philogeny example.fasta
+    cat example.fasta | vim-philogeny
+    vim-philogeny
+    edit comments
 github
-publish in plugin repositories
