@@ -1,4 +1,7 @@
 #!/bin/sh -eu
+# The VIM-based multiple sequence alignment (MSA) editor.
+# The project is released under the General Public License (GPL), version 3.
+# Copyright © 2018, Danil Semelenov, Stas Malavin.
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
 function s:edit_comment(index)
