@@ -4,16 +4,18 @@ sync 3 lists
   delete line
   lines in insert mode
 chars
+  InsertCharPre
   space -> -
   lower case -> upper case
   disallow invalid chars
 highlight syntax
 settings
+github description
 readme
+  description
   installation
   usage
     vim-philogeny example.fasta
     cat example.fasta | vim-philogeny
     vim-philogeny
     edit comments
-github
