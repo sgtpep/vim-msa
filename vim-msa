@@ -37,9 +37,10 @@ function s:configure_sequences(type)
   setlocal scrollbind
 endfunction
 
-function s:configure_vertical_split()
+function s:configure_vim()
   highlight VertSplit cterm=NONE gui=NONE term=NONE
   set fillchars+=vert:│
+  set laststatus=0
 endfunction
 
 function s:edit_comment(index)
@@ -52,13 +53,10 @@ function s:edit_comment(index)
   wincmd p
 endfunction
 
-function s:hide_status_line()
-  set laststatus=0
-endfunction
-
 function s:main()
-  call s:setup_windows()
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_file('fasta', expand('%'))
+  call s:configure_vim()
+  call s:split_windows()
 endfunction
 
 function s:mark_modified()
@@ -108,12 +106,6 @@ function s:read_file(type, path)
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
   call s:update_comments(comments)
-endfunction
-
-function s:setup_windows()
-  call s:configure_vertical_split()
-  call s:hide_status_line()
-  call s:split_windows()
 endfunction
 
 function s:split_windows()
