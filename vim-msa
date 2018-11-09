@@ -99,8 +99,7 @@ endfunction
 
 function s:read_file(type, path)
   call win_gotoid(1000)
-  let undo_levels = &undolevels
-  setlocal undolevels=-1
+  let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
   %delete _
   execute 'let comments = filereadable(a:path) ? s:read_' . a:type . '(a:path) : []'
   let &l:undolevels = undo_levels
