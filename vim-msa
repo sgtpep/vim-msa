@@ -4,138 +4,161 @@
 # Copyright © 2018, Danil Semelenov, Stas Malavin.
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
-function s:edit_comment(index)
-  let view = winsaveview()
-  silent split `=tempname()`
+function s:append_line(line)
+  let number = line('$') == 1 && getline(1) == '' ? 1 : line('$') + 1
+  call setline(number, a:line)
+endfunction
+
+function s:configure_comment(index)
+  execute 'autocmd BufWriteCmd <buffer> call s:update_comment(' . a:index . ', join(getline(0, "$"), " ")) | close!'
   resize 3
   setlocal nobuflisted
   setlocal statusline=[Comment]
+endfunction
+
+function s:configure_comments()
+  setlocal nobuflisted
+  setlocal nomodifiable
+  setlocal nowrap
+  setlocal scrollbind
+  setlocal statusline=[Comments]
+  setlocal winfixwidth
+  vertical resize 10
+endfunction
+
+function s:configure_sequences(type)
+  autocmd TextChanged <buffer> call s:on_sequences_changed()
+  execute 'autocmd BufWriteCmd <buffer> call s:write_file("' . a:type . '", expand("%"))'
+  inoremap <buffer> <CR> <Nop>
+  let &l:filetype = a:type
+  nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
+  setlocal backspace-=eol
+  setlocal nowrap
+  setlocal scrollbind
+endfunction
+
+function s:configure_vertical_split()
+  highlight VertSplit cterm=NONE gui=NONE term=NONE
+  set fillchars+=vert:│
+endfunction
+
+function s:edit_comment(index)
+  let view = winsaveview()
+  silent split `=tempname()`
+  call s:configure_comment(a:index)
   call setline(1, s:comments[a:index])
-  let id = s:select_window(1000)
+  wincmd p
   call winrestview(view)
-  call win_gotoid(id)
-  let b:index = a:index
-  autocmd BufWriteCmd <buffer> call s:update_comment(b:index, join(getline(0, '$'), ' ')) | close!
+  wincmd p
+endfunction
+
+function s:hide_status_line()
+  set laststatus=0
 endfunction
 
 function s:main()
   call s:setup_windows()
-  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_fasta(expand('%'))
-  autocmd VimEnter * nnoremap <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
+  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_file('fasta', expand('%'))
 endfunction
 
-function s:on_read_file(filetype, comments, sequences)
-  let &l:filetype = a:filetype
-  call s:update_comments(a:comments)
-  call s:update_window(1000, a:sequences)
-  execute 'autocmd BufWriteCmd <buffer> call s:write_' . a:filetype . '(expand("%"), s:comments)'
-  autocmd TextChanged <buffer> call s:on_text_changed()
+function s:mark_modified()
+  call win_gotoid(1000)
+  setlocal modified
+  wincmd p
 endfunction
 
-function s:on_text_changed()
+function s:on_sequences_changed()
   if line('$') != len(s:comments)
     silent undo
     echo ''
   endif
 endfunction
 
-function s:on_write_file(path)
-  setlocal nomodified
-  echomsg '"' . a:path . '" written'
-endfunction
-
 function s:read_fasta(path)
   let comments = []
-  let sequences = []
-  if filereadable(a:path)
-    let prev_line = ''
-    for line in readfile(a:path)
-      if line !~ '^\s*$'
-        if line =~ '^[>;]'
-          if line !~ '^;' || prev_line !~ '^[>;]'
-            call add(comments, substitute(line, '^[>;]\s*', '', ''))
-            call add(sequences, '')
+  let prev_line = ''
+  for line in readfile(a:path)
+    if line !~ '^\s*$'
+      if line =~ '^[>;]'
+        if line !~ '^;' || prev_line !~ '^[>;]'
+          call add(comments, substitute(line, '^[>;]\s*', '', ''))
+          if exists('sequence')
+            call s:append_line(sequence)
           endif
-        else
-          let sequences[len(comments) - 1] .= substitute(line, '\*$', '', '')
+          let sequence = ''
         endif
+      else
+        let sequence .= substitute(line, '\*$', '', '')
       endif
-      let prev_line = line
-    endfor
+    endif
+    let prev_line = line
+  endfor
+  if exists('sequence')
+    call s:append_line(sequence)
   endif
-  call s:on_read_file('fasta', comments, sequences)
+  return comments
 endfunction
 
-function s:select_window(id)
-  let id = win_getid()
-  call win_gotoid(a:id)
-  return id
+function s:read_file(type, path)
+  call win_gotoid(1000)
+  let undo_levels = &undolevels
+  setlocal undolevels=-1
+  %delete _
+  execute 'let comments = filereadable(a:path) ? s:read_' . a:type . '(a:path) : []'
+  let &l:undolevels = undo_levels
+  call s:configure_sequences(a:type)
+  call s:update_comments(comments)
 endfunction
 
 function s:setup_windows()
-  highlight VertSplit cterm=NONE gui=NONE term=NONE
-  set fillchars+=vert:│
-  set laststatus=0
+  call s:configure_vertical_split()
+  call s:hide_status_line()
+  call s:split_windows()
+endfunction
+
+function s:split_windows()
   vnew
-  vertical resize 10
-  setlocal nobuflisted
-  setlocal statusline=[Comments]
-  setlocal winfixwidth
-  autocmd VimEnter * wincmd l
+  call s:configure_comments()
+  autocmd VimEnter * call win_gotoid(1000)
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
 function s:update_comment(index, comment)
   let s:comments[a:index] = a:comment
   call s:update_comments(s:comments)
-  let id = s:select_window(1000)
-  setlocal modified
-  call win_gotoid(id)
+  call s:mark_modified()
 endfunction
 
 function s:update_comments(comments)
   let s:comments = a:comments
-  call s:update_window(1001, map(copy(a:comments), 'split(v:val, "", 1)[0]'))
-endfunction
-
-function s:update_window(id, lines)
-  let id = s:select_window(a:id)
-  setlocal nowrap
-  setlocal scrollbind
-  if a:id == 1000
-    setlocal backspace-=eol
-    let undo_levels = &undolevels
-    setlocal undolevels=-1
-    inoremap <buffer> <CR> <Nop>
-  elseif a:id == 1001
-    setlocal modifiable
-    setlocal readonly
-  endif
+  call win_gotoid(1001)
+  setlocal modifiable
   %delete _
-  call setline(1, a:lines)
-  if a:id == 1000
-    let &l:undolevels = undo_levels
-  elseif a:id == 1001
-    setlocal nomodifiable
-  endif
-  call win_gotoid(id)
+  call setline(1, map(copy(a:comments), 'split(v:val, "", 1)[0]'))
+  setlocal nomodifiable
+  wincmd p
 endfunction
 
-function s:write_fasta(path, comments)
-  call writefile([], a:path)
-  for index in range(0, len(a:comments) - 1)
-    call writefile(['>' . a:comments[index]], expand('%'), 'a')
+function s:write_fasta(path)
+  for index in range(0, len(s:comments) - 1)
+    call writefile(['>' . s:comments[index]], expand('%'), 'a')
     let sequence = getline(index + 1)
     for index in range(0, len(sequence) - 1, 70)
       call writefile([sequence[index:index + 70 - 1]], a:path, 'a')
     endfor
   endfor
-  call s:on_write_file(a:path)
+endfunction
+
+function s:write_file(type, path)
+  call writefile([], a:path)
+  execute 'call s:write_' . a:type . '(a:path)'
+  setlocal nomodified
+  echomsg '"' . a:path . '" written'
 endfunction
 
 call s:main()
 EOF
-set -- --cmd 'source '"$(/usr/bin/env printf %q "$path")"'.vim' "$@"
+set -- --cmd "source $path.vim" "$@"
 if [ -t 0 ]; then
   exec vim "$@"
 else
