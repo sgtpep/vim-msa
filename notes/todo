@@ -1,12 +1,2 @@
-sync 3 lists
-  o
-  O
-  dd
-  visual
-    x
-    X
-    dd
-  P
-  p
-  undo/redo
+o/O
 support file creation
