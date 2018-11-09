@@ -1,6 +1,6 @@
 # vim-msa
 
-The VIM-based multiple sequence alignment (MSA) editor.
+The [VIM](https://www.vim.org/)-based [multiple sequence alignment (MSA)](https://en.wikipedia.org/wiki/Multiple_sequence_alignment) editor.
 
 ## Installation
 
@@ -15,7 +15,7 @@ This script requires VIM to be installed and available as `vim` in your shell.
 
 ## Usage
 
-Just open the file in FASTA format:
+Just open the file in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format):
 
 ```
 vim-msa /path/file.fasta
@@ -33,7 +33,7 @@ To edit a comment to the sequence move the cursor to its line and press `gc`, ed
 ## Features
 
 - Reads and writes files in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format).
-- Reads input in FASTA format from standard input and writes the result to standard output to be used in shell pipes.
+- Reads input in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format) from standard input and writes the result to standard output to be used in shell pipes.
 
 ## License and copyright
 
