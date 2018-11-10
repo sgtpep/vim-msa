@@ -33,6 +33,7 @@ function s:configure_sequences(type)
   let &l:filetype = a:type
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
   setlocal backspace-=eol
+  setlocal ignorecase
   setlocal nowrap
   setlocal scrollbind
 endfunction
