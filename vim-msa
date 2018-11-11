@@ -162,7 +162,7 @@ function s:update_comments(...)
   call win_gotoid(1001)
   setlocal modifiable
   %delete _
-  call setline(1, map(copy(s:comments), 'split(v:val, "", 1)[0]'))
+  call setline(1, map(copy(s:comments), {index, comment -> split(comment, '', 1)[0]}))
   setlocal nomodifiable
   wincmd p
 endfunction
