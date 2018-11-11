@@ -36,7 +36,9 @@ endfunction
 
 function s:configure_sequences(type)
   autocmd TextChanged <buffer> call s:on_sequences_changed()
+  execute join(map(range(char2nr('a'), char2nr('z')), {index, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
   inoremap <buffer> <CR> <Nop>
+  inoremap <buffer> <Space> -
   let &l:filetype = a:type
   let s:deleted_comments = {}
   nnoremap <buffer> <silent> O :call <SID>add_comment(line('.') - 1)<CR>O
