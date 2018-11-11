@@ -136,7 +136,7 @@ function s:read_file(type, path)
   call win_gotoid(1000)
   let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
   %delete _
-  execute 'let comments = filereadable(a:path) ? s:read_' . a:type . '(a:path) : []'
+  execute printf('let comments = filereadable(a:path) ? s:read_%s(a:path) : []', a:type)
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
   call s:update_comments(comments)
@@ -169,7 +169,7 @@ endfunction
 
 function s:write_fasta(path)
   for index in range(0, len(s:comments) - 1)
-    call writefile(['>' . s:comments[index]], expand('%'), 'a')
+    call writefile([printf('>%s', s:comments[index])], expand('%'), 'a')
     let sequence = getline(index + 1)
     let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
     for index in range
@@ -181,9 +181,9 @@ endfunction
 function s:write_file(type, path)
   call win_gotoid(1000)
   call writefile([], a:path)
-  execute 'call s:write_' . a:type . '(a:path)'
+  execute printf('call s:write_%s(a:path)', a:type)
   setlocal nomodified
-  echomsg '"' . a:path . '" written'
+  echomsg printf('"%s" written', a:path)
 endfunction
 
 call s:main()
