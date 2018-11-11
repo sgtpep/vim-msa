@@ -1,11 +1,3 @@
-chars
-  InsertCharPre, :noreabbrev
-  space -> -
-  lower case -> upper case
-  disallow invalid chars
-highlight syntax
-settings
 screenshots
-auto-capitalization on open and input
-  setting
 versions and releases
+settings

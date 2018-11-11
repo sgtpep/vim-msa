@@ -1,0 +1,8 @@
+chars
+  InsertCharPre, :noreabbrev
+  space -> -
+  lower case -> upper case
+  disallow invalid chars
+highlight syntax
+auto-capitalization on open and input
+  setting
