@@ -95,9 +95,15 @@ function s:on_buffer_write()
 endfunction
 
 function s:on_sequences_changed()
-  if line('$') != len(s:comments)
-    silent undo
-    echo ''
+  let [sequences, comments] = [line('$'), len(s:comments)]
+  if sequences != comments
+    let [start, end] = [getpos("'[")[1], getpos("']")[1]]
+    if sequences > comments
+      let s:comments = s:comments[:start - 2] + repeat([''], end - start + 1) + s:comments[start - 1:]
+    else
+      call remove(s:comments, start - 1, start + comments - sequences - 2)
+    endif
+    call s:update_comments()
   endif
 endfunction
 
