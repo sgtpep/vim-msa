@@ -5,7 +5,7 @@
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
 function s:add_comment(index)
-  call insert(s:comments, '', s:buffer_empty() ? 0 : a:index)
+  call insert(s:comments, '', a:index)
   call s:update_comments()
 endfunction
 
