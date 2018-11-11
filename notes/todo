@@ -1,6 +1,3 @@
-chars
-  InsertCharPre, :noreabbrev
-  disallow invalid chars
 highlight syntax
 auto-capitalization on open and input
   setting
