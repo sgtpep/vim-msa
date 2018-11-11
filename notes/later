@@ -8,5 +8,4 @@ settings
 screenshots
 auto-capitalization on open and input
   setting
-support vim-msa ./output.fasta < ./example.fasta
 versions and releases
