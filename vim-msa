@@ -124,7 +124,7 @@ endfunction
 function s:read_fasta(path)
   let comments = []
   let prev_line = ''
-  let s:filter_sequence = {sequence -> substitute(sequence, '\*$', '', '')}
+  let s:filter_sequence = {sequence -> toupper(substitute(sequence, '\*$', '', ''))}
   for line in readfile(a:path)
     if line !~ '^\s*$'
       if line =~ '^[>;]'
