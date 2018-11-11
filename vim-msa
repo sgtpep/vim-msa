@@ -38,6 +38,7 @@ function s:configure_sequences(type)
   autocmd TextChanged <buffer> call s:on_sequences_changed()
   inoremap <buffer> <CR> <Nop>
   let &l:filetype = a:type
+  let s:deleted_comments = {}
   nnoremap <buffer> <silent> O :call <SID>add_comment(line('.') - 1)<CR>O
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
   nnoremap <buffer> <silent> o :call <SID>add_comment(line('.'))<CR>o
@@ -99,9 +100,22 @@ function s:on_sequences_changed()
   if sequences != comments
     let [start, end] = [getpos("'[")[1], getpos("']")[1]]
     if sequences > comments
-      let s:comments = s:comments[:start - 2] + repeat([''], end - start + 1) + s:comments[start - 1:]
+      if end == sequences
+        let start += 1
+      endif
+      let s:comments = (start - 2 == -1 ? [] : s:comments[:start - 2]) + map(range(start - 1, end - 1), {index, value -> get(s:deleted_comments, value, '')}) + s:comments[start - 1:]
     else
-      call remove(s:comments, start - 1, start + comments - sequences - 2)
+      let [first, last] = [start - 1, start + comments - sequences - 2]
+      if s:buffer_empty()
+        let last += 1
+      endif
+      for index in range(first, last)
+        let s:deleted_comments[index] = s:comments[index]
+      endfor
+      call remove(s:comments, first, last)
+      if !len(s:comments)
+        let s:comments = ['']
+      endif
     endif
     call s:update_comments()
   endif
