@@ -10,7 +10,7 @@ function s:append_line(line)
 endfunction
 
 function s:configure_comment(index)
-  execute 'autocmd BufWriteCmd <buffer> call s:update_comment(' . a:index . ', join(getline(0, "$"), " ")) | close!'
+  let b:index = a:index
   resize 3
   setlocal nobuflisted
   setlocal statusline=[Comment]
@@ -54,8 +54,18 @@ function s:edit_comment(index)
   wincmd p
 endfunction
 
+function s:initialize_empty()
+  call win_gotoid(1000)
+  if !len(expand('%'))
+    call s:configure_sequences('fasta')
+    call s:update_comments([''])
+  endif
+endfunction
+
 function s:main()
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_file('fasta', expand('%'))
+  autocmd BufWriteCmd * call s:on_buffer_write()
+  autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
   call s:split_windows()
 endfunction
@@ -64,6 +74,15 @@ function s:mark_modified()
   call win_gotoid(1000)
   setlocal modified
   wincmd p
+endfunction
+
+function s:on_buffer_write()
+  if &statusline == '[Comment]'
+    call s:update_comment(b:index, join(getline(0, '$'), ' '))
+    close!
+  else
+    call s:write_file(&filetype, expand('%'))
+  endif
 endfunction
 
 function s:on_sequences_changed()
@@ -142,6 +161,7 @@ function s:write_fasta(path)
 endfunction
 
 function s:write_file(type, path)
+  call win_gotoid(1000)
   call writefile([], a:path)
   execute 'call s:write_' . a:type . '(a:path)'
   setlocal nomodified
