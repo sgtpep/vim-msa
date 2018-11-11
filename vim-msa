@@ -124,13 +124,14 @@ endfunction
 function s:read_fasta(path)
   let comments = []
   let prev_line = ''
+  let s:filter_sequence = {sequence -> substitute(sequence, '\*$', '', '')}
   for line in readfile(a:path)
     if line !~ '^\s*$'
       if line =~ '^[>;]'
         if line !~ '^;' || prev_line !~ '^[>;]'
           call add(comments, substitute(line, '^[>;]\s*', '', ''))
           if exists('sequence')
-            call s:append_line(substitute(sequence, '\*$', '', ''))
+            call s:append_line(s:filter_sequence(sequence))
           endif
           let sequence = ''
         endif
@@ -141,7 +142,7 @@ function s:read_fasta(path)
     let prev_line = line
   endfor
   if exists('sequence')
-    call s:append_line(substitute(sequence, '\*$', '', ''))
+    call s:append_line(s:filter_sequence(sequence))
   endif
   return comments
 endfunction
