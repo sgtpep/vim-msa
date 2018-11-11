@@ -4,9 +4,17 @@
 # Copyright © 2018, Danil Semelenov, Stas Malavin.
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
+function s:add_comment(index)
+  call insert(s:comments, '', s:buffer_empty() ? 0 : a:index)
+  call s:update_comments(s:comments)
+endfunction
+
 function s:append_line(line)
-  let number = line('$') == 1 && getline(1) == '' ? 1 : line('$') + 1
-  call setline(number, a:line)
+  call setline(s:buffer_empty() ? 1 : line('$') + 1, a:line)
+endfunction
+
+function s:buffer_empty()
+  return line('$') == 1 && getline(1) == ''
 endfunction
 
 function s:configure_comment(index)
@@ -28,10 +36,11 @@ endfunction
 
 function s:configure_sequences(type)
   autocmd TextChanged <buffer> call s:on_sequences_changed()
-  execute 'autocmd BufWriteCmd <buffer> call s:write_file("' . a:type . '", expand("%"))'
   inoremap <buffer> <CR> <Nop>
   let &l:filetype = a:type
+  nnoremap <buffer> <silent> O :call <SID>add_comment(line('.') - 1)<CR>O
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
+  nnoremap <buffer> <silent> o :call <SID>add_comment(line('.'))<CR>o
   setlocal backspace-=eol
   setlocal ignorecase
   setlocal nowrap
