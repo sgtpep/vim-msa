@@ -1,4 +1,5 @@
+highlight
+  errors https://github.com/vim-scripts/Syntax-for-Fasta/blob/master/syntax/fasta.vim
 screenshots
-versions and releases
 settings
   auto-capitalization on open and input
