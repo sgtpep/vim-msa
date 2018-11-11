@@ -6,7 +6,7 @@ path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
 function s:add_comment(index)
   call insert(s:comments, '', s:buffer_empty() ? 0 : a:index)
-  call s:update_comments(s:comments)
+  call s:update_comments()
 endfunction
 
 function s:append_line(line)
@@ -145,16 +145,18 @@ endfunction
 
 function s:update_comment(index, comment)
   let s:comments[a:index] = a:comment
-  call s:update_comments(s:comments)
+  call s:update_comments()
   call s:mark_modified()
 endfunction
 
-function s:update_comments(comments)
-  let s:comments = a:comments
+function s:update_comments(...)
+  if a:0 >= 1
+    let s:comments = a:1
+  endif
   call win_gotoid(1001)
   setlocal modifiable
   %delete _
-  call setline(1, map(copy(a:comments), 'split(v:val, "", 1)[0]'))
+  call setline(1, map(copy(s:comments), 'split(v:val, "", 1)[0]'))
   setlocal nomodifiable
   wincmd p
 endfunction
