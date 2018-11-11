@@ -154,7 +154,8 @@ function s:write_fasta(path)
   for index in range(0, len(s:comments) - 1)
     call writefile(['>' . s:comments[index]], expand('%'), 'a')
     let sequence = getline(index + 1)
-    for index in range(0, len(sequence) - 1, 70)
+    let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
+    for index in range
       call writefile([sequence[index:index + 70 - 1]], a:path, 'a')
     endfor
   endfor
