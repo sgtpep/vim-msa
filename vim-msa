@@ -102,13 +102,14 @@ function s:on_sequences_changed()
   if sequences != comments
     let [start, end] = [getpos("'[")[1], getpos("']")[1]]
     if sequences > comments
-      if end == sequences
+      if start != 1 && end == sequences
         let start += 1
       endif
-      let s:comments = (start - 2 == -1 ? [] : s:comments[:start - 2]) + map(range(start - 1, end - 1), {index, value -> get(s:deleted_comments, value, '')}) + s:comments[start - 1:]
+      let whole = start == 1 && end == sequences
+      let s:comments = (whole || start - 2 == -1 ? [] : s:comments[:start - 2]) + map(range(start - 1, end - 1), {index, value -> get(s:deleted_comments, value, '')}) + (whole ? [] : s:comments[start - 1:])
     else
       let [first, last] = [start - 1, start + comments - sequences - 2]
-      if s:buffer_empty()
+      if start == 1 && s:buffer_empty()
         let last += 1
       endif
       for index in range(first, last)
