@@ -35,7 +35,7 @@ function s:configure_comments()
 endfunction
 
 function s:configure_sequences(type)
-  autocmd TextChanged <buffer> call s:on_sequences_changed()
+  autocmd TextChanged <buffer> call s:syncronize_comments()
   execute join(map(range(char2nr('a'), char2nr('z')), {index, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
   inoremap <buffer> <CR> <Nop>
   inoremap <buffer> <Space> -
@@ -76,7 +76,7 @@ endfunction
 
 function s:main()
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_file('fasta', expand('%'))
-  autocmd BufWriteCmd * call s:on_buffer_write()
+  autocmd BufWriteCmd * call s:write_buffer(expand('%'))
   autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
   call s:split_windows()
@@ -86,42 +86,6 @@ function s:mark_modified()
   call win_gotoid(1000)
   setlocal modified
   wincmd p
-endfunction
-
-function s:on_buffer_write()
-  if &statusline == '[Comment]'
-    call s:update_comment(b:index, join(getline(0, '$'), ' '))
-    close!
-  else
-    call s:write_file(&filetype, expand('%'))
-  endif
-endfunction
-
-function s:on_sequences_changed()
-  let [sequences, comments] = [line('$'), len(s:comments)]
-  if sequences != comments
-    let [start, end] = [getpos("'[")[1], getpos("']")[1]]
-    if sequences > comments
-      if start != 1 && end == sequences
-        let start += 1
-      endif
-      let whole = start == 1 && end == sequences
-      let s:comments = (whole || start - 2 == -1 ? [] : s:comments[:start - 2]) + map(range(start - 1, end - 1), {index, value -> get(s:deleted_comments, value, '')}) + (whole ? [] : s:comments[start - 1:])
-    else
-      let [first, last] = [start - 1, start + comments - sequences - 2]
-      if start == 1 && s:buffer_empty()
-        let last += 1
-      endif
-      for index in range(first, last)
-        let s:deleted_comments[index] = s:comments[index]
-      endfor
-      call remove(s:comments, first, last)
-      if !len(s:comments)
-        let s:comments = ['']
-      endif
-    endif
-    call s:update_comments()
-  endif
 endfunction
 
 function s:read_fasta(path)
@@ -167,6 +131,33 @@ function s:split_windows()
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
+function s:syncronize_comments()
+  let [sequences, comments] = [line('$'), len(s:comments)]
+  if sequences != comments
+    let [start, end] = [getpos("'[")[1], getpos("']")[1]]
+    if sequences > comments
+      if start != 1 && end == sequences
+        let start += 1
+      endif
+      let whole = start == 1 && end == sequences
+      let s:comments = (whole || start - 2 == -1 ? [] : s:comments[:start - 2]) + map(range(start - 1, end - 1), {index, value -> get(s:deleted_comments, value, '')}) + (whole ? [] : s:comments[start - 1:])
+    else
+      let [first, last] = [start - 1, start + comments - sequences - 2]
+      if start == 1 && s:buffer_empty()
+        let last += 1
+      endif
+      for index in range(first, last)
+        let s:deleted_comments[index] = s:comments[index]
+      endfor
+      call remove(s:comments, first, last)
+      if !len(s:comments)
+        let s:comments = ['']
+      endif
+    endif
+    call s:update_comments()
+  endif
+endfunction
+
 function s:update_comment(index, comment)
   let s:comments[a:index] = a:comment
   call s:update_comments()
@@ -183,6 +174,15 @@ function s:update_comments(...)
   call setline(1, map(copy(s:comments), {index, comment -> split(comment, '', 1)[0]}))
   setlocal nomodifiable
   wincmd p
+endfunction
+
+function s:write_buffer(path)
+  if &statusline == '[Comment]'
+    call s:update_comment(b:index, join(getline(0, '$'), ' '))
+    close!
+  else
+    call s:write_file(&filetype, a:path)
+  endif
 endfunction
 
 function s:write_fasta(path)
