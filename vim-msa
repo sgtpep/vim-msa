@@ -208,12 +208,14 @@ endfunction
 
 call s:main()
 EOF
-set -- --cmd "source $path.vim" "$@"
+command=vim
+! command -v nvim > /dev/null || command=nvim
+set -- "$command" --cmd "source $path.vim" "$@"
 if [ -t 0 ]; then
-  exec vim "$@"
+  exec "$@"
 else
   cat > "$path".fasta
-  vim "$@" "$path".fasta < /dev/tty > /dev/tty
+  "$@" "$path".fasta < /dev/tty > /dev/tty
   cat "$path".fasta
   rm "$path".fasta
 fi

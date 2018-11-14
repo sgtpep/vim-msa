@@ -11,7 +11,7 @@ sudo curl -o /usr/local/bin/vim-msa https://raw.githubusercontent.com/sgtpep/vim
 sudo chmod +x /usr/local/bin/vim-msa
 ```
 
-This script requires VIM to be installed and available as `vim` in your shell.
+This script requires [VIM](https://www.vim.org/) or [Neovim](https://neovim.io/) to be installed and available as `vim` or `nvim` in your shell.
 
 ## Usage
 
