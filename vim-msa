@@ -75,8 +75,8 @@ function s:initialize_empty()
 endfunction
 
 function s:main()
-  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_file('fasta', expand('%'))
-  autocmd BufWriteCmd * call s:write_buffer(expand('%'))
+  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.seq call s:read_file('fasta', expand('<amatch>'))
+  autocmd BufWriteCmd * call s:write_buffer(expand('<amatch>'))
   autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
   call s:split_windows()
@@ -187,7 +187,7 @@ endfunction
 
 function s:write_fasta(path)
   for index in range(0, len(s:comments) - 1)
-    call writefile([printf('>%s', s:comments[index])], expand('%'), 'a')
+    call writefile([printf('>%s', s:comments[index])], a:path, 'a')
     let sequence = getline(index + 1)
     let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
     for index in range
@@ -200,8 +200,10 @@ function s:write_file(type, path)
   call win_gotoid(1000)
   call writefile([], a:path)
   execute printf('call s:write_%s(a:path)', a:type)
-  setlocal nomodified
-  echomsg printf('"%s" written', a:path)
+  if a:path == expand('%:p')
+    setlocal nomodified
+  endif
+  echomsg printf('"%s" written', a:path == expand('%:p') ? expand('%') : a:path == expand('#:p') ? expand('#') : a:path)
 endfunction
 
 call s:main()
