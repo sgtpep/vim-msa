@@ -35,7 +35,7 @@ function s:configure_comments()
 endfunction
 
 function s:configure_sequences(type)
-  autocmd TextChanged <buffer> call s:syncronize_comments()
+  autocmd TextChanged <buffer> call s:synchronize_comments()
   execute join(map(range(char2nr('a'), char2nr('z')), {index, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
   inoremap <buffer> <CR> <Nop>
   inoremap <buffer> <Space> -
@@ -131,7 +131,7 @@ function s:split_windows()
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
-function s:syncronize_comments()
+function s:synchronize_comments()
   let [sequences, comments] = [line('$'), len(s:comments)]
   if sequences != comments
     let [start, end] = [getpos("'[")[1], getpos("']")[1]]

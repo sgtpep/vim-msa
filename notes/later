@@ -3,4 +3,6 @@ highlight
 screenshots
 settings
   auto-capitalization on open and input
+  toupper/leave setting on input
+  toupper/leave setting on read
 promote
