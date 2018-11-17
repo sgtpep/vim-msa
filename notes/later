@@ -2,7 +2,6 @@ highlight
   errors https://github.com/vim-scripts/Syntax-for-Fasta/blob/master/syntax/fasta.vim
 screenshots
 settings
-  auto-capitalization on open and input
-  toupper/leave setting on input
-  toupper/leave setting on read
+  to upper or leave on read
+  to upper or leave on input
 promote
