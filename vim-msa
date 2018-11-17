@@ -126,15 +126,18 @@ function s:read_file(type, path)
     try
       execute printf('let comments = s:read_%s(a:path)', a:type)
     catch
-      echomsg printf('Error reading "%s"', s:original_path(a:path))
-      return
     endtry
   else
     let comments = []
   endif
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
-  call s:update_comments(comments)
+  if exists('comments') && len(comments) == line('$')
+    call s:update_comments(comments)
+  else
+    %delete _
+    echomsg printf('Error reading "%s"', s:original_path(a:path))
+  endif
 endfunction
 
 function s:split_windows()
