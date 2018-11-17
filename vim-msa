@@ -71,7 +71,7 @@ function s:initialize_empty()
   call win_gotoid(1000)
   if !len(expand('%'))
     call s:configure_sequences('fasta')
-    call s:update_comments([''])
+    call s:update_comments([])
   endif
 endfunction
 
@@ -125,15 +125,14 @@ function s:read_file(type, path)
   if filereadable(a:path)
     try
       execute printf('let comments = s:read_%s(a:path)', a:type)
-    finally
-      let comments = len(comments) ? comments : ['']
+    catch
     endtry
   else
     let comments = []
   endif
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
-  if exists('comments') && len(comments) == line('$')
+  if exists('comments') && (len(comments) == line('$') || !len(comments) && s:buffer_empty())
     call s:update_comments(comments)
   else
     %delete _
@@ -183,7 +182,7 @@ endfunction
 
 function s:update_comments(...)
   if a:0 >= 1
-    let s:comments = a:1
+    let s:comments = len(a:1) ? a:1 : ['']
   endif
   call win_gotoid(1001)
   setlocal modifiable
