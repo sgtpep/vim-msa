@@ -18,7 +18,7 @@ function s:buffer_empty()
 endfunction
 
 function s:configure_comment(index)
-  let b:index = a:index
+  execute printf('autocmd BufWriteCmd <buffer> call s:update_comment(%d, join(getline(0, "$"), " ")) | close!', a:index)
   resize 3
   setlocal nobuflisted
   setlocal statusline=[Comment]
@@ -35,6 +35,7 @@ function s:configure_names()
 endfunction
 
 function s:configure_sequences(type)
+  autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
   autocmd TextChanged <buffer> call s:synchronize_comments()
   execute join(map(range(char2nr('a'), char2nr('z')), {index, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
   inoremap <buffer> <CR> <Nop>
@@ -76,7 +77,6 @@ endfunction
 
 function s:main()
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.fst,*.mafft,*.seq call s:read_file('fasta', expand('<amatch>'))
-  autocmd BufWriteCmd * call s:write_buffer(expand('<amatch>'))
   autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
   call s:split_windows()
@@ -174,15 +174,6 @@ function s:update_comments(...)
   call setline(1, map(copy(s:comments), {index, comment -> split(comment, '', 1)[0]}))
   setlocal nomodifiable
   wincmd p
-endfunction
-
-function s:write_buffer(path)
-  if &statusline == '[Comment]'
-    call s:update_comment(b:index, join(getline(0, '$'), ' '))
-    close!
-  else
-    call s:write_file(&filetype, a:path)
-  endif
 endfunction
 
 function s:write_fasta(path)
