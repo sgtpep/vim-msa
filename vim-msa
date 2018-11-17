@@ -88,6 +88,10 @@ function s:mark_modified()
   wincmd p
 endfunction
 
+function s:original_path(path)
+  return a:path == expand('%:p') ? expand('%') : a:path == expand('#:p') ? expand('#') : a:path
+endfunction
+
 function s:read_fasta(path)
   let comments = []
   let prev_line = ''
@@ -118,7 +122,16 @@ function s:read_file(type, path)
   call win_gotoid(1000)
   let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
   %delete _
-  execute printf('let comments = filereadable(a:path) ? s:read_%s(a:path) : []', a:type)
+  if filereadable(a:path)
+    try
+      execute printf('let comments = s:read_%s(a:path)', a:type)
+    catch
+      echomsg printf('Error reading "%s"', s:original_path(a:path))
+      return
+    endtry
+  else
+    let comments = []
+  endif
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
   call s:update_comments(comments)
@@ -194,7 +207,7 @@ function s:write_file(type, path)
   if a:path == expand('%:p')
     setlocal nomodified
   endif
-  echomsg printf('"%s" written', a:path == expand('%:p') ? expand('%') : a:path == expand('#:p') ? expand('#') : a:path)
+  echomsg printf('"%s" written', original_path(a:path))
 endfunction
 
 call s:main()
