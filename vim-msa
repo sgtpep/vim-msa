@@ -24,7 +24,7 @@ function s:configure_comment(index)
   setlocal statusline=[Comment]
 endfunction
 
-function s:configure_comments()
+function s:configure_names()
   setlocal nobuflisted
   setlocal nomodifiable
   setlocal nowrap
@@ -126,7 +126,7 @@ endfunction
 
 function s:split_windows()
   vnew
-  call s:configure_comments()
+  call s:configure_names()
   autocmd VimEnter * call win_gotoid(1000)
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
