@@ -125,7 +125,8 @@ function s:read_file(type, path)
   if filereadable(a:path)
     try
       execute printf('let comments = s:read_%s(a:path)', a:type)
-    catch
+    finally
+      let comments = len(comments) ? comments : ['']
     endtry
   else
     let comments = []
