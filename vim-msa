@@ -210,7 +210,7 @@ function s:write_file(type, path)
   if a:path == expand('%:p')
     setlocal nomodified
   endif
-  echomsg printf('"%s" written', original_path(a:path))
+  echomsg printf('"%s" written', s:original_path(a:path))
 endfunction
 
 call s:main()
