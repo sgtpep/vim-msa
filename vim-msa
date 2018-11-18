@@ -121,7 +121,7 @@ endfunction
 function s:read_file(type, path)
   call win_gotoid(1000)
   let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
-  %delete _
+  silent %delete _
   if filereadable(a:path)
     try
       execute printf('let comments = s:read_%s(a:path)', a:type)
@@ -135,7 +135,7 @@ function s:read_file(type, path)
   if exists('comments') && (len(comments) == line('$') || !len(comments) && s:buffer_empty())
     call s:update_comments(comments)
   else
-    %delete _
+    silent %delete _
     echomsg printf('Error reading "%s"', s:original_path(a:path))
   endif
 endfunction
@@ -186,7 +186,7 @@ function s:update_comments(...)
   endif
   call win_gotoid(1001)
   setlocal modifiable
-  %delete _
+  silent %delete _
   call setline(1, map(copy(s:comments), {index, comment -> split(comment, '', 1)[0]}))
   setlocal nomodifiable
   wincmd p
