@@ -57,16 +57,6 @@ function s:configure_vim()
   set laststatus=0
 endfunction
 
-function s:detect_type(path)
-  let extension = split(a:path, '\.')[-1]
-  if index(['fa', 'faa', 'fas', 'fasta', 'ffn', 'fna', 'frn', 'fsa', 'fst', 'mafft', 'seq'], extension) != -1
-    return 'fasta'
-  else
-    echomsg "Unknown file type, falling back to 'fasta'"
-    return 'fasta'
-  endif
-endfunction
-
 function s:edit_comment(index)
   let view = winsaveview()
   silent split `=tempname()`
@@ -86,7 +76,7 @@ function s:initialize_empty()
 endfunction
 
 function s:main()
-  autocmd BufReadCmd * call s:read_file(expand('<amatch>'))
+  autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.fst,*.mafft,*.seq call s:read_file('fasta', expand('<amatch>'))
   autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
   call s:split_windows()
@@ -128,21 +118,20 @@ function s:read_fasta(path)
   return comments
 endfunction
 
-function s:read_file(path)
+function s:read_file(type, path)
   call win_gotoid(1000)
-  let type = s:detect_type(a:path)
   let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
   %delete _
   if filereadable(a:path)
     try
-      execute printf('let comments = s:read_%s(a:path)', type)
+      execute printf('let comments = s:read_%s(a:path)', a:type)
     catch
     endtry
   else
     let comments = []
   endif
   let &l:undolevels = undo_levels
-  call s:configure_sequences(type)
+  call s:configure_sequences(a:type)
   if exists('comments') && (len(comments) == line('$') || !len(comments) && s:buffer_empty())
     call s:update_comments(comments)
   else
