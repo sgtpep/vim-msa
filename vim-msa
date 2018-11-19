@@ -150,25 +150,22 @@ endfunction
 function s:synchronize_comments()
   let [sequences, comments] = [line('$'), len(s:comments)]
   if sequences != comments
-    let [start, end] = [getpos("'[")[1], getpos("']")[1]]
+    let [start, end] = [getpos("'[")[1] - 1, getpos("']")[1] - 1]
     if sequences > comments
-      if start != 1 && end == sequences
+      if start && end == sequences - 1
         let start += 1
       endif
-      let whole = start == 1 && end == sequences
-      let s:comments = (whole || start - 2 == -1 ? [] : s:comments[:start - 2]) + map(range(start - 1, end - 1), {index, value -> get(s:deleted_comments, value, '')}) + (whole ? [] : s:comments[start - 1:])
+      let whole = start == 0 && end == sequences - 1
+      let s:comments = (whole || !start ? [] : s:comments[:start - 1]) + map(range(start, end), {_, index -> get(s:deleted_comments, index, '')}) + (whole ? [] : s:comments[start:])
     else
-      let [first, last] = [start - 1, start + comments - sequences - 2]
-      if start == 1 && s:buffer_empty()
-        let last += 1
+      let end = start + comments - sequences - 1
+      if !start && s:buffer_empty()
+        let end += 1
       endif
-      for index in range(first, last)
+      for index in range(start, end)
         let s:deleted_comments[index] = s:comments[index]
       endfor
-      call remove(s:comments, first, last)
-      if !len(s:comments)
-        let s:comments = ['']
-      endif
+      call remove(s:comments, start, end)
     endif
     call s:update_comments()
   endif
@@ -182,7 +179,10 @@ endfunction
 
 function s:update_comments(...)
   if a:0 >= 1
-    let s:comments = len(a:1) ? a:1 : ['']
+    let s:comments = a:1
+  endif
+  if !len(s:comments)
+    let s:comments = ['']
   endif
   call win_gotoid(1001)
   setlocal modifiable
