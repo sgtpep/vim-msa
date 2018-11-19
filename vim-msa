@@ -150,15 +150,19 @@ endfunction
 function s:synchronize_comments()
   let [sequences, comments] = [line('$'), len(s:comments)]
   if sequences != comments
-    let [start, end] = [getpos("'[")[1] - 1, getpos("']")[1] - 1]
+    let start = getpos("'[")[1] - 1
+    let end = start + abs(sequences - comments) - 1
     if sequences > comments
+      let change_end = getpos("']")[1] - 1
+      if change_end == sequences - 1
+        let end = change_end
+      endif
       if start && end == sequences - 1
         let start += 1
       endif
-      let whole = start == 0 && end == sequences - 1
+      let whole = !start && end == sequences - 1
       let s:comments = (whole || !start ? [] : s:comments[:start - 1]) + map(range(start, end), {_, index -> get(s:deleted_comments, index, '')}) + (whole ? [] : s:comments[start:])
     else
-      let end = start + comments - sequences - 1
       if !start && s:buffer_empty()
         let end += 1
       endif
