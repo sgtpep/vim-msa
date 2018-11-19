@@ -4,11 +4,6 @@
 # Copyright © 2018, Danil Semelenov, Stas Malavin.
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
-function s:add_comment(index)
-  call insert(s:comments, '', a:index)
-  call s:update_comments()
-endfunction
-
 function s:append_line(line)
   call setline(s:buffer_empty() ? 1 : line('$') + 1, a:line)
 endfunction
@@ -17,8 +12,8 @@ function s:buffer_empty()
   return line('$') == 1 && getline(1) == ''
 endfunction
 
-function s:configure_comment(index)
-  execute printf('autocmd BufWriteCmd <buffer> call s:update_comment(%d, join(getline(0, "$"), " ")) | close!', a:index)
+function s:configure_comment(number)
+  execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
   resize 3
   setlocal nobuflisted
   setlocal statusline=[Comment]
@@ -36,19 +31,23 @@ endfunction
 
 function s:configure_sequences(type)
   autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
-  autocmd TextChanged <buffer> call s:synchronize_comments()
-  execute join(map(range(char2nr('a'), char2nr('z')), {index, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
+  autocmd TextChanged <buffer> call s:synchronize_names()
+  execute join(map(range(char2nr('a'), char2nr('z')), {_, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
   inoremap <buffer> <CR> <Nop>
   inoremap <buffer> <Space> -
+  inoremap <buffer> > <Nop>
   let &l:filetype = a:type
-  let s:deleted_comments = {}
-  nnoremap <buffer> <silent> O :call <SID>add_comment(line('.') - 1)<CR>O
-  nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.') - 1)<CR>
-  nnoremap <buffer> <silent> o :call <SID>add_comment(line('.'))<CR>o
+  nnoremap <buffer> <silent> O O<C-O>:call <SID>update_names()<CR>
+  nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.'))<CR>
+  nnoremap <buffer> <silent> o o<C-O>:call <SID>update_names()<CR>
   setlocal backspace-=eol
+  setlocal buftype=acwrite
+  setlocal concealcursor=cinv
+  setlocal conceallevel=3
   setlocal ignorecase
   setlocal nowrap
   setlocal scrollbind
+  syntax match Comment />.*$/ conceal
 endfunction
 
 function s:configure_vim()
@@ -57,11 +56,12 @@ function s:configure_vim()
   set laststatus=0
 endfunction
 
-function s:edit_comment(index)
+function s:edit_comment(number)
+  let comment = join(split(getline(a:number), '>', 1)[1:], '>')
   let view = winsaveview()
   silent split `=tempname()`
-  call s:configure_comment(a:index)
-  call setline(1, s:comments[a:index])
+  call s:configure_comment(a:number)
+  call setline(1, comment)
   wincmd p
   call winrestview(view)
   wincmd p
@@ -71,7 +71,6 @@ function s:initialize_empty()
   call win_gotoid(1000)
   if !len(expand('%'))
     call s:configure_sequences('fasta')
-    call s:update_comments([])
   endif
 endfunction
 
@@ -82,27 +81,20 @@ function s:main()
   call s:split_windows()
 endfunction
 
-function s:mark_modified()
-  call win_gotoid(1000)
-  setlocal modified
-  wincmd p
-endfunction
-
 function s:original_path(path)
   return a:path == expand('%:p') ? expand('%') : a:path == expand('#:p') ? expand('#') : a:path
 endfunction
 
 function s:read_fasta(path)
-  let comments = []
   let prev_line = ''
-  let s:filter_sequence = {sequence -> toupper(substitute(sequence, '\*$', '', ''))}
+  let s:build_line = {sequence, comment -> printf('%s>%s', toupper(substitute(sequence, '\*$', '', '')), comment)}
   for line in readfile(a:path)
     if line !~ '^\s*$'
       if line =~ '^[>;]'
         if line !~ '^;' || prev_line !~ '^[>;]'
-          call add(comments, substitute(line, '^[>;]\s*', '', ''))
+          let comment = substitute(line, '^[>;]\s*', '', '')
           if exists('sequence')
-            call s:append_line(s:filter_sequence(sequence))
+            call s:append_line(s:build_line(sequence, comment))
           endif
           let sequence = ''
         endif
@@ -113,9 +105,8 @@ function s:read_fasta(path)
     let prev_line = line
   endfor
   if exists('sequence')
-    call s:append_line(s:filter_sequence(sequence))
+    call s:append_line(s:build_line(sequence, comment))
   endif
-  return comments
 endfunction
 
 function s:read_file(type, path)
@@ -124,17 +115,14 @@ function s:read_file(type, path)
   silent %delete _
   if filereadable(a:path)
     try
-      execute printf('let comments = s:read_%s(a:path)', a:type)
+      execute printf('call s:read_%s(a:path)', a:type)
     catch
     endtry
-  else
-    let comments = []
   endif
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
-  if exists('comments') && (len(comments) == line('$') || !len(comments) && s:buffer_empty())
-    call s:update_comments(comments)
-  else
+  call s:update_names()
+  if len(filter(getline(1, '$'), {_, line -> stridx(line, '>') == -1})) && !s:buffer_empty()
     silent %delete _
     echomsg printf('Error reading "%s"', s:original_path(a:path))
   endif
@@ -147,59 +135,41 @@ function s:split_windows()
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
 endfunction
 
-function s:synchronize_comments()
-  let [sequences, comments] = [line('$'), len(s:comments)]
-  if sequences != comments
-    let start = getpos("'[")[1] - 1
-    let end = start + abs(sequences - comments) - 1
-    if sequences > comments
-      let change_end = getpos("']")[1] - 1
-      if change_end == sequences - 1
-        let end = change_end
-      endif
-      if start && end == sequences - 1
-        let start += 1
-      endif
-      let whole = !start && end == sequences - 1
-      let s:comments = (whole || !start ? [] : s:comments[:start - 1]) + map(range(start, end), {_, index -> get(s:deleted_comments, index, '')}) + (whole ? [] : s:comments[start:])
-    else
-      if !start && s:buffer_empty()
-        let end += 1
-      endif
-      for index in range(start, end)
-        let s:deleted_comments[index] = s:comments[index]
-      endfor
-      call remove(s:comments, start, end)
-    endif
-    call s:update_comments()
+function s:synchronize_names()
+  call win_gotoid(1001)
+  let names = line('$')
+  wincmd p
+  if names != line('$')
+    call s:update_names()
   endif
 endfunction
 
-function s:update_comment(index, comment)
-  let s:comments[a:index] = a:comment
-  call s:update_comments()
-  call s:mark_modified()
+function s:update_comment(number, comment)
+  call setline(a:number, printf('%s>%s', split(getline(a:number), '>', 1)[0], a:comment))
+  call s:update_names()
+  setlocal modified
 endfunction
 
-function s:update_comments(...)
-  if a:0 >= 1
-    let s:comments = a:1
-  endif
-  if !len(s:comments)
-    let s:comments = ['']
-  endif
+function s:update_names()
+  let names = map(getline(1, '$'), {_, line -> split(join(split(line, '>', 1)[1:], '>'), '', 1)[0]})
   call win_gotoid(1001)
   setlocal modifiable
-  silent %delete _
-  call setline(1, map(copy(s:comments), {index, comment -> split(comment, '', 1)[0]}))
+  call setline(1, names)
+  silent! execute printf('%d,$delete _', len(names) + 1)
   setlocal nomodifiable
   wincmd p
 endfunction
 
+function s:write_comment(number)
+  let comment = join(getline(1, '$'), ' ')
+  close!
+  call s:update_comment(a:number, comment)
+endfunction
+
 function s:write_fasta(path)
-  for index in range(0, len(s:comments) - 1)
-    call writefile([printf('>%s', s:comments[index])], a:path, 'a')
-    let sequence = getline(index + 1)
+  for line in getline(1, '$')
+    call writefile([printf('>%s', join(split(line, '>', 1)[1:], '>'))], a:path, 'a')
+    let sequence = split(line, '>', 1)[0]
     let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
     for index in range
       call writefile([sequence[index:index + 70 - 1]], a:path, 'a')

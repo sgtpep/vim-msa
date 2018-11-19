@@ -1,8 +1,3 @@
-fnameescape
-try conseal
-  syntax match Comment />.*$/ conceal
-    local
-  disable > in insert
-  setlocal conceallevel=2
-  setlocal concealcursor=cinv
-  CursorMoved, CursorMovedI: disallow cursor there
+CursorMoved, CursorMovedI: disallow cursor there
+TextChanged: undo if a comment destroyed
+paste over a visual selection
