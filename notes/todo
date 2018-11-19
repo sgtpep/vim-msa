@@ -1,0 +1,8 @@
+fnameescape
+try conseal
+  syntax match Comment />.*$/ conceal
+    local
+  disable > in insert
+  setlocal conceallevel=2
+  setlocal concealcursor=cinv
+  CursorMoved, CursorMovedI: disallow cursor there
