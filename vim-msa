@@ -191,12 +191,12 @@ call s:main()
 EOF
 command=vim
 ! command -v nvim > /dev/null || command=nvim
-set -- "$command" --cmd "source $path.vim" "$@"
+set -- "$command" --cmd 'execute printf("source %s.vim", fnameescape($path))' "$@"
 if [ -t 0 ]; then
-  exec "$@"
+  path=$path exec "$@"
 else
   cat > "$path".fasta
-  "$@" "$path".fasta < /dev/tty > /dev/tty
+  path=$path "$@" "$path".fasta < /dev/tty > /dev/tty
   cat "$path".fasta
   rm "$path".fasta
 fi
