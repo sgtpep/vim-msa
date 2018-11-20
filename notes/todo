@@ -1,3 +1,0 @@
-CursorMoved, CursorMovedI: disallow cursor there
-TextChanged: undo if a comment destroyed
-paste over a visual selection

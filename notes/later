@@ -1,8 +1,0 @@
-highlight
-  errors https://github.com/vim-scripts/Syntax-for-Fasta/blob/master/syntax/fasta.vim
-  themes? (a-la seaview, a-la jalview, etc.)
-screenshots
-settings
-  to upper or leave on read
-  to upper or leave on input
-promote
