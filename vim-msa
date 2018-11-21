@@ -151,10 +151,15 @@ function s:split_windows()
 endfunction
 
 function s:synchronize_names()
-  let [start, end] = [getpos("'["), getpos("']")]
-  if start == end || start[1] != end[1] || start[1] == end[1] && start[2] == 1 && end[2] == len(getline(end[1]))
-    call s:update_names()
-  end
+  let names = getbufline(winbufnr(1001), 1, '$')
+  if len(filter(getline(1, '$'), {index, line -> len(get(names, index)) && stridx(line, '>') == -1}))
+    silent undo
+  else
+    let [start, end] = [getpos("'["), getpos("']")]
+    if start == end || start[1] != end[1] || start[1] == end[1] && start[2] == 1 && end[2] == len(getline(end[1]))
+      call s:update_names()
+    endif
+  endif
 endfunction
 
 function s:update_comment(number, comment)
