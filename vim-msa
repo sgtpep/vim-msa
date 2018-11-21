@@ -148,14 +148,10 @@ function s:split_windows()
 endfunction
 
 function s:synchronize_names()
-  if line('$') == len(getbufline(winbufnr(1001), 1, '$'))
-    let [start, end] = [getpos("'["), getpos("']")]
-    if start[1] == end[1] && start[2] == 1 && end[2] == len(getline(end[1])) || start[1] != end[1]
-      call s:update_names()
-    end
-  else
+  let [start, end] = [getpos("'["), getpos("']")]
+  if start == end || start[1] != end[1] || start[1] == end[1] && start[2] == 1 && end[2] == len(getline(end[1]))
     call s:update_names()
-  endif
+  end
 endfunction
 
 function s:update_comment(number, comment)
