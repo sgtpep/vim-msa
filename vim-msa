@@ -31,7 +31,8 @@ endfunction
 
 function s:configure_sequences(type)
   autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
-  autocmd CursorMoved <buffer> call s:move_cursor()
+  autocmd CursorMoved <buffer> call s:move_cursor(0)
+  autocmd CursorMovedI <buffer> call s:move_cursor(1)
   autocmd TextChanged <buffer> call s:synchronize_names()
   execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> printf("inoremap <buffer> %s %s\nnoremap <buffer> f%s f%s", character, toupper(character), character, toupper(character))}), "\n")
   inoremap <buffer> <CR> <Nop>
@@ -82,8 +83,8 @@ function s:main()
   call s:split_windows()
 endfunction
 
-function s:move_cursor()
-  let index = stridx(getline('.'), '>')
+function s:move_cursor(offset)
+  let index = stridx(getline('.'), '>') + a:offset
   let position = getcurpos()
   if index != -1 && position[2] > index
     let position[2] = index
