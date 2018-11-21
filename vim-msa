@@ -201,8 +201,9 @@ endfunction
 
 call s:main()
 EOF
-command=vim
-! command -v nvim > /dev/null || command=nvim
+for command in vim nvim vim; do
+  ! command -v "$command" > /dev/null || break
+done
 set -- "$command" --cmd 'execute printf("source %s.vim", fnameescape($path))' "$@"
 if [ -t 0 ]; then
   path=$path exec "$@"
