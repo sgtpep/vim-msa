@@ -103,10 +103,10 @@ function s:read_fasta(path)
     if line !~ '^\s*$'
       if line =~ '^[>;]'
         if line !~ '^;' || prev_line !~ '^[>;]'
-          let comment = substitute(line, '^[>;]\s*', '', '')
           if exists('sequence')
             call s:append_line(s:build_line(sequence, comment))
           endif
+          let comment = substitute(line, '^[>;]\s*', '', '')
           let sequence = ''
         endif
       else
