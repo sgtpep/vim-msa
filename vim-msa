@@ -84,11 +84,14 @@ function s:main()
 endfunction
 
 function s:move_cursor(offset)
-  let index = stridx(getline('.'), '>') + a:offset
-  let position = getcurpos()
-  if index != -1 && position[2] > index
-    let position[2] = index
-    call setpos('.', position)
+  let index = stridx(getline('.'), '>')
+  if index != -1
+    let index += a:offset
+    let position = getcurpos()
+    if index != -1 && position[2] > index
+      let position[2] = index
+      call setpos('.', position)
+    endif
   endif
 endfunction
 
