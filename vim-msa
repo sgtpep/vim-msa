@@ -30,6 +30,7 @@ function s:configure_names()
 endfunction
 
 function s:configure_sequences(type)
+  autocmd CursorMoved <buffer> call s:move_cursor()
   autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
   autocmd TextChanged <buffer> call s:synchronize_names()
   execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> printf('inoremap <buffer> %s %s | noremap <buffer> f%s f%sh', character, toupper(character), character, toupper(character))}), ' | ')
@@ -79,6 +80,15 @@ function s:main()
   autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
   call s:split_windows()
+endfunction
+
+function s:move_cursor()
+  let index = stridx(getline('.'), '>')
+  let position = getcurpos()
+  if index != -1 && position[2] > index
+    let position[2] = index
+    call setpos('.', position)
+  endif
 endfunction
 
 function s:original_path(path)
