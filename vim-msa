@@ -30,8 +30,8 @@ function s:configure_names()
 endfunction
 
 function s:configure_sequences(type)
-  autocmd CursorMoved <buffer> call s:move_cursor()
   autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
+  autocmd CursorMoved <buffer> call s:move_cursor()
   autocmd TextChanged <buffer> call s:synchronize_names()
   execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> printf("inoremap <buffer> %s %s\nnoremap <buffer> f%s f%s", character, toupper(character), character, toupper(character))}), "\n")
   inoremap <buffer> <CR> <Nop>
