@@ -128,12 +128,13 @@ function s:read_file(type, path)
     try
       execute printf('call s:read_%s(a:path)', a:type)
     catch
+      let error = 1
     endtry
   endif
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
   call s:update_names()
-  if len(filter(getline(1, '$'), {_, line -> stridx(line, '>') == -1})) && !s:buffer_empty()
+  if exists('error') || len(filter(getline(1, '$'), {_, line -> stridx(line, '>') == -1})) && !s:buffer_empty()
     silent %delete _
     echomsg printf('Error reading "%s"', s:original_path(a:path))
   endif
