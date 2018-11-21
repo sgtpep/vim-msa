@@ -148,10 +148,12 @@ function s:split_windows()
 endfunction
 
 function s:synchronize_names()
-  call win_gotoid(1001)
-  let names = line('$')
-  wincmd p
-  if names != line('$')
+  if line('$') == len(getbufline(winbufnr(1001), 1, '$'))
+    let [start, end] = [getpos("'["), getpos("']")]
+    if start[1] == end[1] && start[2] == 1 && end[2] == len(getline(end[1])) || start[1] != end[1]
+      call s:update_names()
+    end
+  else
     call s:update_names()
   endif
 endfunction
