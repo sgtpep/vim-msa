@@ -32,7 +32,7 @@ endfunction
 function s:configure_sequences(type)
   autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
   autocmd TextChanged <buffer> call s:synchronize_names()
-  execute join(map(range(char2nr('a'), char2nr('z')), {_, number -> printf('inoremap <buffer> %s %s', nr2char(number), toupper(nr2char(number)))}), "\n")
+  execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> printf('inoremap <buffer> %s %s | noremap <buffer> f%s f%sh', character, toupper(character), character, toupper(character))}), ' | ')
   inoremap <buffer> <CR> <Nop>
   inoremap <buffer> <Space> -
   inoremap <buffer> > <Nop>
