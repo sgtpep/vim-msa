@@ -13,6 +13,8 @@ function s:buffer_empty()
 endfunction
 
 function s:configure_comment(number)
+  autocmd BufWinLeave <buffer> call s:update_status('')
+  call s:update_status('Comment')
   execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
   resize 3
   setlocal nobuflisted
@@ -65,10 +67,10 @@ endfunction
 function s:edit_comment(number)
   let comment = join(split(getline(a:number), '>', 1)[1:], '>')
   let view = winsaveview()
-  silent split `=tempname()`
+  silent belowright split `=tempname()`
   call s:configure_comment(a:number)
   call setline(1, comment)
-  wincmd p
+  call win_gotoid(1000)
   call winrestview(view)
   wincmd p
 endfunction
@@ -191,6 +193,12 @@ function s:update_names()
   call setline(1, names)
   silent! execute printf('%d,$delete _', len(names) + 1)
   setlocal nomodifiable
+  wincmd p
+endfunction
+
+function s:update_status(status)
+  call win_gotoid(1000)
+  let &l:statusline = a:status
   wincmd p
 endfunction
 
