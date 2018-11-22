@@ -86,17 +86,19 @@ function s:main()
 endfunction
 
 function s:move_cursor(offset)
-  if mode() == 'v'
+  if mode() ==# 'v'
     let [start, end] = [getpos('v'), getpos('.')]
+    let index = stridx(getline(start[1]), '>')
+    let index = index == -1 ? len(getline(start[1])) : index
     if start[1] == end[1]
-      if getpos('.')[2] == len(getline('.')) + 1
+      if getpos('.')[2] > index
         let position = getcurpos()
         let position[2] -= 1
         call setpos('.', position)
       endif
-    elseif mode() ==# 'v'
-      let [position, index] = [getcurpos(), stridx(getline(start[1]), '>')]
-      let [position[1], position[2]] = [start[1], start[1] > end[1] ? 1 : index == -1 ? len(getline(start[1])) : index]
+    else
+      let position = getcurpos()
+      let [position[1], position[2]] = [start[1], start[1] > end[1] ? 1 : index]
       call setpos('.', position)
     endif
   else
