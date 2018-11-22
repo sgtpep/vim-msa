@@ -16,7 +16,7 @@ function s:configure_comment(number)
   execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
   resize 3
   setlocal nobuflisted
-  setlocal statusline=[Comment]
+  setlocal statusline=Comment
 endfunction
 
 function s:configure_names()
@@ -24,7 +24,7 @@ function s:configure_names()
   setlocal nomodifiable
   setlocal nowrap
   setlocal scrollbind
-  setlocal statusline=[Names]
+  setlocal statusline=Names
   setlocal winfixwidth
   vertical resize 10
 endfunction
