@@ -44,6 +44,7 @@ function s:configure_sequences(type)
   nnoremap <buffer> <silent> O O<C-O>:call <SID>update_names()<CR>
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.'))<CR>
   nnoremap <buffer> <silent> o o<C-O>:call <SID>update_names()<CR>
+  nnoremap <buffer> <silent> x :<C-U>execute printf('normal! %dx', stridx(getline('.'), '>') == -1 ? v:count1 : min([v:count1, stridx(getline('.'), '>') - getpos('.')[2] + 1]))<CR>
   setlocal backspace-=eol
   setlocal buftype=acwrite
   setlocal concealcursor=cinv
