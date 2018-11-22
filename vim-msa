@@ -39,6 +39,8 @@ function s:configure_sequences(type)
   inoremap <buffer> <Space> -
   inoremap <buffer> > <Nop>
   let &l:filetype = a:type
+  nnoremap <buffer> <expr> <silent> C stridx(getline('.'), '>') == -1 ? 'C' : 'ct>'
+  nnoremap <buffer> <expr> <silent> D stridx(getline('.'), '>') == -1 ? 'D' : 'dt>'
   nnoremap <buffer> <silent> O O<C-O>:call <SID>update_names()<CR>
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.'))<CR>
   nnoremap <buffer> <silent> o o<C-O>:call <SID>update_names()<CR>
