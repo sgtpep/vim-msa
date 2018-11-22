@@ -24,7 +24,7 @@ function s:configure_names()
   setlocal nomodifiable
   setlocal nowrap
   setlocal scrollbind
-  setlocal statusline=[Comments]
+  setlocal statusline=[Names]
   setlocal winfixwidth
   vertical resize 10
 endfunction
