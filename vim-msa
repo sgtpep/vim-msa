@@ -57,7 +57,7 @@ function s:configure_sequences(type)
 endfunction
 
 function s:configure_vim()
-  highlight VertSplit cterm=NONE gui=NONE term=NONE
+  highlight VertSplit NONE
   set fillchars+=vert:│
   set laststatus=0
 endfunction
