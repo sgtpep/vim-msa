@@ -227,6 +227,9 @@ function s:write_file(type, path)
     setlocal nomodified
   endif
   echomsg printf('"%s" written', s:original_path(a:path))
+  if !len(expand('%'))
+    silent execute printf('file %s', fnameescape(a:path))
+  endif
 endfunction
 
 call s:main()
