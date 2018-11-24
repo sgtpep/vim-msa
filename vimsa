@@ -13,6 +13,7 @@ function s:buffer_empty()
 endfunction
 
 function s:configure_comment(number)
+  autocmd BufUnload <buffer> syncbind | call win_gotoid(1000) | call winrestview(b:view)
   autocmd BufWinLeave <buffer> call s:update_status('')
   call s:update_status('Comment')
   execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
@@ -66,12 +67,13 @@ endfunction
 
 function s:edit_comment(number)
   let comment = join(split(getline(a:number), '>', 1)[1:], '>')
-  let view = winsaveview()
+  let b:view = winsaveview()
   silent belowright split `=tempname()`
   call s:configure_comment(a:number)
   call setline(1, comment)
   call win_gotoid(1000)
-  call winrestview(view)
+  call winrestview(b:view)
+  syncbind
   wincmd p
 endfunction
 
