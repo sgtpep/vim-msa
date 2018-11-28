@@ -61,8 +61,10 @@ endfunction
 
 function s:configure_vim()
   highlight VertSplit NONE
-  set fillchars+=vert:│
   set laststatus=0
+  if &encoding == 'utf-8'
+    set fillchars+=vert:│
+  endif
 endfunction
 
 function s:edit_comment(number)
