@@ -110,7 +110,7 @@ function s:move_cursor(offset)
       let [position[1], position[2]] = [start[1], start[1] > end[1] ? 1 : index]
       call setpos('.', position)
     endif
-  else
+  elseif mode() !=# 'V'
     let index = strridx(getline('.'), '>')
     if index != -1
       let index += a:offset
