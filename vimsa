@@ -54,6 +54,7 @@ function s:configure_sequences(type)
   setlocal concealcursor=cinv
   setlocal conceallevel=3
   setlocal ignorecase
+  setlocal nostartofline
   setlocal nowrap
   setlocal scrollbind
   syntax match Comment />.*$/ conceal
