@@ -226,8 +226,10 @@ endfunction
 
 function s:write_file(type, path)
   call win_gotoid(1000)
-  call writefile([], a:path)
-  execute printf('call s:write_%s(a:path)', a:type)
+  let path = printf('%s~', a:path)
+  call writefile([], path)
+  execute printf('call s:write_%s(path)', a:type)
+  call rename(path, a:path)
   if a:path ==# expand('%:p')
     setlocal nomodified
   endif
