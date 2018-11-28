@@ -214,11 +214,11 @@ endfunction
 
 function s:write_fasta(path)
   for line in getline(1, '$')
-    call writefile([printf('>%s', join(split(line, '>', 1)[1:], '>'))], a:path, 'a')
+    call writefile([printf('>%s', join(split(line, '>', 1)[1:], '>'))], a:path, 'Sa')
     let sequence = split(line, '>', 1)[0]
     let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
     for index in range
-      call writefile([sequence[index:index + 70 - 1]], a:path, 'a')
+      call writefile([sequence[index:index + 70 - 1]], a:path, 'Sa')
     endfor
   endfor
 endfunction
