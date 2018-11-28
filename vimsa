@@ -38,17 +38,17 @@ function s:configure_sequences(type)
   autocmd CursorMovedI <buffer> call s:move_cursor(1)
   autocmd TextChanged <buffer> call s:synchronize_names()
   execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> printf("inoremap <buffer> %s %s\nnoremap <buffer> f%s f%s", character, toupper(character), character, toupper(character))}), "\n")
-  inoremap <buffer> <expr> <Del> getpos('.')[2] > stridx(getline('.'), '>') ? '' : '<Del>'
+  inoremap <buffer> <expr> <Del> getpos('.')[2] > strridx(getline('.'), '>') ? '' : '<Del>'
   inoremap <buffer> <CR> <Nop>
   inoremap <buffer> <Space> -
   inoremap <buffer> > <Nop>
   let &l:filetype = a:type
-  nnoremap <buffer> <expr> <silent> C stridx(getline('.'), '>') == -1 ? 'C' : 'ct>'
-  nnoremap <buffer> <expr> <silent> D stridx(getline('.'), '>') == -1 ? 'D' : 'dt>'
+  nnoremap <buffer> <expr> <silent> C strridx(getline('.'), '>') == -1 ? 'C' : 'ct>'
+  nnoremap <buffer> <expr> <silent> D strridx(getline('.'), '>') == -1 ? 'D' : 'dt>'
   nnoremap <buffer> <silent> O O<C-O>:call <SID>update_names()<CR>
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.'))<CR>
   nnoremap <buffer> <silent> o o<C-O>:call <SID>update_names()<CR>
-  nnoremap <buffer> <silent> x :<C-U>execute printf('normal! %dx', stridx(getline('.'), '>') == -1 ? v:count1 : min([v:count1, stridx(getline('.'), '>') - getpos('.')[2] + 1]))<CR>
+  nnoremap <buffer> <silent> x :<C-U>execute printf('normal! %dx', strridx(getline('.'), '>') == -1 ? v:count1 : min([v:count1, strridx(getline('.'), '>') - getpos('.')[2] + 1]))<CR>
   setlocal backspace-=eol
   setlocal buftype=acwrite
   setlocal concealcursor=cinv
@@ -97,7 +97,7 @@ endfunction
 function s:move_cursor(offset)
   if mode() ==# 'v'
     let [start, end] = [getpos('v'), getpos('.')]
-    let index = stridx(getline(start[1]), '>')
+    let index = strridx(getline(start[1]), '>')
     let index = index == -1 ? len(getline(start[1])) : index
     if start[1] == end[1]
       if getpos('.')[2] > index
@@ -111,7 +111,7 @@ function s:move_cursor(offset)
       call setpos('.', position)
     endif
   else
-    let index = stridx(getline('.'), '>')
+    let index = strridx(getline('.'), '>')
     if index != -1
       let index += a:offset
       let position = getcurpos()
@@ -165,7 +165,7 @@ function s:read_file(type, path)
   let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
   call s:update_names()
-  if exists('error') || len(filter(getline(1, '$'), {_, line -> stridx(line, '>') == -1})) && !s:buffer_empty()
+  if exists('error') || len(filter(getline(1, '$'), {_, line -> strridx(line, '>') == -1})) && !s:buffer_empty()
     silent %delete _
     echomsg printf('Error reading "%s"', s:original_path(a:path))
   endif
