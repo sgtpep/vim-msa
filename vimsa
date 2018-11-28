@@ -37,7 +37,7 @@ function s:configure_sequences(type)
   autocmd CursorMoved <buffer> call s:move_cursor(0)
   autocmd CursorMovedI <buffer> call s:move_cursor(1)
   autocmd TextChanged <buffer> call s:synchronize_names()
-  execute join(map(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> [character, toupper(character)]}), {_, character -> printf("inoremap <buffer> %s %s\nnoremap <buffer> f%s f%s", character[0], character[1], character[0], character[1])}), "\n")
+  execute join(map(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> [character, toupper(character)]}), {_, character -> printf("inoremap <buffer> %s %s\nnoremap <buffer> f%s f%s\nnoremap <buffer> r%s r%s", character[0], character[1], character[0], character[1], character[0], character[1])}), "\n")
   inoremap <buffer> <expr> <Del> getpos('.')[2] > strridx(getline('.'), '>') ? '' : '<Del>'
   inoremap <buffer> <CR> <Nop>
   inoremap <buffer> <Space> -
