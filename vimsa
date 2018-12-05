@@ -75,7 +75,7 @@ endfunction
 function s:edit_comment(number)
   let comment = join(split(getline(a:number), '>', 1)[1:], '>')
   let view = winsaveview()
-  silent belowright split `=tempname()`
+  silent rightbelow split `=tempname()`
   call s:configure_comment(a:number)
   call setline(1, comment)
   call win_gotoid(1000)
