@@ -17,8 +17,7 @@ function s:comment_index(...)
 endfunction
 
 function s:configure_comment(number)
-  autocmd BufUnload <buffer> syncbind | call win_gotoid(1000) | call winrestview(b:view)
-  autocmd BufWinLeave <buffer> call s:update_status('')
+  autocmd BufUnload <buffer> call s:update_status('') | execute printf('%dwindo syncbind', win_id2win(1000))
   call s:update_status('Comment')
   execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
   resize 3
@@ -75,12 +74,12 @@ endfunction
 
 function s:edit_comment(number)
   let comment = join(split(getline(a:number), '>', 1)[1:], '>')
-  let b:view = winsaveview()
+  let view = winsaveview()
   silent belowright split `=tempname()`
   call s:configure_comment(a:number)
   call setline(1, comment)
   call win_gotoid(1000)
-  call winrestview(b:view)
+  call winrestview(view)
   syncbind
   wincmd p
 endfunction
