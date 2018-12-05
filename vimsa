@@ -19,7 +19,7 @@ endfunction
 function s:configure_comment(number)
   autocmd BufWinLeave <buffer> call s:update_status('') | execute printf('%dwindo syncbind', win_id2win(1000))
   call s:update_status('Comment')
-  execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
+  execute printf('autocmd BufWriteCmd <buffer> call s:update_comment(%d, join(getline(1, "$"), " "))', a:number)
   resize 3
   setlocal nobuflisted
   setlocal statusline=Comment
@@ -78,10 +78,10 @@ function s:edit_comment(number)
   silent rightbelow split `=tempname()`
   call s:configure_comment(a:number)
   call setline(1, comment)
-  call win_gotoid(1000)
+  let id = s:select_window(1000)
   call winrestview(view)
   syncbind
-  wincmd p
+  call win_gotoid(id)
 endfunction
 
 function s:initialize_empty()
@@ -176,6 +176,12 @@ function s:read_file(type, path)
   endif
 endfunction
 
+function s:select_window(id)
+  let id = win_getid()
+  call win_gotoid(a:id)
+  return id
+endfunction
+
 function s:split_windows()
   vnew
   call s:configure_names()
@@ -191,31 +197,28 @@ function s:synchronize_names()
 endfunction
 
 function s:update_comment(number, comment)
+  let id = s:select_window(1000)
   call setline(a:number, printf('%s>%s', split(getline(a:number), '>', 1)[0], a:comment))
   call s:update_names()
   setlocal modified
+  call win_gotoid(id)
+  setlocal nomodified
 endfunction
 
 function s:update_names()
   let names = map(getline(1, '$'), {_, line -> split(join(split(line, '>', 1)[1:], '>'), '', 1)[0]})
-  call win_gotoid(1001)
+  let id = s:select_window(1001)
   setlocal modifiable
   call setline(1, names)
   silent! execute printf('%d,$delete _', len(names) + 1)
   setlocal nomodifiable
-  wincmd p
+  call win_gotoid(id)
 endfunction
 
 function s:update_status(status)
-  call win_gotoid(1000)
+  let id = s:select_window(1000)
   let &l:statusline = a:status
-  wincmd p
-endfunction
-
-function s:write_comment(number)
-  let comment = join(getline(1, '$'), ' ')
-  close!
-  call s:update_comment(a:number, comment)
+  call win_gotoid(id)
 endfunction
 
 function s:write_fasta(path)
