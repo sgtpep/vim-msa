@@ -123,7 +123,7 @@ function s:initialize_empty()
 endfunction
 
 function s:main()
-  autocmd BufRead * echomsg 'Unknown format'
+  autocmd BufRead * if expand('<amatch>:h') !=# fnamemodify(&helpfile, ':h') | echomsg 'Unknown format' | endif
   autocmd BufReadCmd *.fa,*.faa,*.fas,*.fasta,*.ffn,*.fna,*.frn,*.fsa,*.fst,*.mafft,*.seq call s:read_file('fasta', expand('<amatch>'))
   autocmd VimEnter * call s:initialize_empty()
   call s:configure_vim()
