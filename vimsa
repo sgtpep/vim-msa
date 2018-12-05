@@ -72,11 +72,11 @@ function s:configure_vim()
   endif
 endfunction
 
-function s:edit_comment(line)
-  let comment = join(split(getline(a:line), '>', 1)[1:], '>')
+function s:edit_comment(number)
+  let comment = s:extract_comment(getline(a:number))
   let view = winsaveview()
   silent rightbelow split `=tempname()`
-  call s:configure_comment(a:line)
+  call s:configure_comment(a:number)
   call setline(1, comment)
   let id = s:select_window(1000)
   call winrestview(view)
@@ -196,7 +196,7 @@ function s:synchronize_names()
   endif
 endfunction
 
-function s:update_comment(line, comment)
+function s:update_comment(number, comment)
   let id = s:select_window(1000)
   call setline(a:number, printf('%s>%s', split(getline(a:number), '>', 1)[0], a:comment))
   call s:update_names()
