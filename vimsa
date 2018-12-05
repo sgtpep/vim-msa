@@ -84,6 +84,14 @@ function s:edit_comment(number)
   call win_gotoid(id)
 endfunction
 
+function s:extract_comment(line)
+  return join(split(a:line, '>', 1)[1:], '>')
+endfunction
+
+function s:extract_sequence(line)
+  return split(a:line, '>', 1)[0]
+endfunction
+
 function s:initialize_empty()
   call win_gotoid(1000)
   if !len(expand('%'))
@@ -206,7 +214,7 @@ function s:update_comment(number, comment)
 endfunction
 
 function s:update_names()
-  let names = map(getline(1, '$'), {_, line -> split(join(split(line, '>', 1)[1:], '>'), '', 1)[0]})
+  let names = map(getline(1, '$'), {_, line -> split(s:extract_comment(line), '', 1)[0]})
   let id = s:select_window(1001)
   setlocal modifiable
   call setline(1, names)
@@ -223,8 +231,8 @@ endfunction
 
 function s:write_fasta(path)
   for line in getline(1, '$')
-    call writefile([printf('>%s', join(split(line, '>', 1)[1:], '>'))], a:path, 'Sa')
-    let sequence = split(line, '>', 1)[0]
+    call writefile([printf('>%s', s:extract_comment(line))], a:path, 'Sa')
+    let sequence = s:extract_sequence(line)
     let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
     for index in range
       call writefile([sequence[index:index + 70 - 1]], a:path, 'Sa')
