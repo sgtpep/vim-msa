@@ -221,7 +221,7 @@ function s:select_window(id)
 endfunction
 
 function s:split_windows()
-  vnew
+  leftabove vnew
   call s:configure_names()
   autocmd VimEnter * call win_gotoid(1000)
   autocmd WinEnter * if !win_id2win(1000) || !win_id2win(1001) | quitall! | endif
