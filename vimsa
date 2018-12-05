@@ -25,6 +25,16 @@ function s:configure_comment(number)
   setlocal statusline=Comment
 endfunction
 
+function s:configure_comments()
+  autocmd BufUnload <buffer> execute printf('%dwindo %d', win_id2win(1000), line('.'))
+  autocmd BufWriteCmd <buffer> call s:update_comments(getline(1, '$'))
+  setlocal nobuflisted
+  setlocal nowrap
+  setlocal scrollbind
+  setlocal statusline=Comments
+  setlocal winfixwidth
+endfunction
+
 function s:configure_names()
   setlocal nobuflisted
   setlocal nomodifiable
@@ -49,6 +59,7 @@ function s:configure_sequences(type)
   nnoremap <buffer> <expr> <silent> C <SID>comment_index() == -1 ? 'C' : 'ct>'
   nnoremap <buffer> <expr> <silent> D <SID>comment_index() == -1 ? 'D' : 'dt>'
   nnoremap <buffer> <silent> O O<C-O>:call <SID>update_names()<CR>
+  nnoremap <buffer> <silent> gC :call <SID>edit_comments()<CR>
   nnoremap <buffer> <silent> gc :call <SID>edit_comment(line('.'))<CR>
   nnoremap <buffer> <silent> o o<C-O>:call <SID>update_names()<CR>
   nnoremap <buffer> <silent> x :<C-U>execute printf('normal! %dx', <SID>comment_index() == -1 ? v:count1 : min([v:count1, <SID>comment_index() - getpos('.')[2] + 1]))<CR>
@@ -80,6 +91,18 @@ function s:edit_comment(number)
   call setline(1, comment)
   let id = s:select_window(1000)
   call winrestview(view)
+  syncbind
+  call win_gotoid(id)
+endfunction
+
+function s:edit_comments()
+  let comments = map(getline(1, '$'), {_, line -> s:comment_index(line) == -1 ? '' : line[s:comment_index(line) + 1:]})
+  let line = line('.')
+  silent rightbelow vsplit `=tempname()`
+  call s:configure_comments()
+  call setline(1, comments)
+  execute line
+  let id = s:select_window(1000)
   syncbind
   call win_gotoid(id)
 endfunction
@@ -134,6 +157,13 @@ function s:move_cursor(offset)
       endif
     endif
   endif
+endfunction
+
+function s:on_comment_update(id)
+  call s:update_names()
+  setlocal modified
+  call win_gotoid(a:id)
+  setlocal nomodified
 endfunction
 
 function s:original_path(path)
@@ -206,11 +236,14 @@ endfunction
 
 function s:update_comment(number, comment)
   let id = s:select_window(1000)
-  call setline(a:number, printf('%s>%s', split(getline(a:number), '>', 1)[0], a:comment))
-  call s:update_names()
-  setlocal modified
-  call win_gotoid(id)
-  setlocal nomodified
+  call setline(a:number, printf('%s>%s', s:extract_sequence(getline(a:number)), a:comment))
+  call s:on_comment_update(id)
+endfunction
+
+function s:update_comments(comments)
+  let id = s:select_window(1000)
+  call setline(1, map(getline(1, '$'), {index, line -> printf('%s>%s', s:extract_sequence(line), get(a:comments, index, ''))}))
+  call s:on_comment_update(id)
 endfunction
 
 function s:update_names()

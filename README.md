@@ -35,6 +35,11 @@ To edit a comment to the sequence move the cursor to its line and press `gc`, ed
 - Reads and writes files in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format).
 - Reads input in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format) from standard input and writes the result to standard output to be used in shell pipes.
 
+## Shortcuts
+
+- `gC`: edit comments of all sequences line by line
+- `gc`: edit a comment of the sequence under cursor
+
 ## License and copyright
 
 The project is released under the General Public License (GPL), version 3.
