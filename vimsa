@@ -17,7 +17,7 @@ function s:comment_index(...)
 endfunction
 
 function s:configure_comment(number)
-  autocmd BufUnload <buffer> call s:update_status('') | execute printf('%dwindo syncbind', win_id2win(1000))
+  autocmd BufWinLeave <buffer> call s:update_status('') | execute printf('%dwindo syncbind', win_id2win(1000))
   call s:update_status('Comment')
   execute printf('autocmd BufWriteCmd <buffer> call s:write_comment(%d)', a:number)
   resize 3
