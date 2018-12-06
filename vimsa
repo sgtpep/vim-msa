@@ -65,6 +65,8 @@ function s:configure_sequences(type)
   nnoremap <buffer> <silent> x :<C-U>execute printf('normal! %dx', <SID>comment_index() == -1 ? v:count1 : min([v:count1, <SID>comment_index() - getpos('.')[2] + 1]))<CR>
   noremap <buffer> r> <Nop>
   setlocal backspace-=eol
+  vnoremap <buffer> <expr> gU <Nop>
+  vnoremap <buffer> <expr> gu <Nop>
   setlocal buftype=acwrite
   setlocal concealcursor=cinv
   setlocal conceallevel=3
