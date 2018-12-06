@@ -4,10 +4,6 @@
 # Copyright © 2018, Danil Semelenov, Stas Malavin.
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
-function s:append_line(line)
-  call setline(s:buffer_empty() ? 1 : line('$') + 1, a:line)
-endfunction
-
 function s:buffer_empty()
   return line('$') == 1 && getline(1) == ''
 endfunction
@@ -49,6 +45,8 @@ function s:configure_sequences(type)
   autocmd BufWriteCmd <buffer> call s:write_file(&filetype, expand('<amatch>'))
   autocmd CursorMoved <buffer> call s:move_cursor(0)
   autocmd CursorMovedI <buffer> call s:move_cursor(1)
+  autocmd FilterReadPre <buffer> execute printf('call writefile(s:read_%s(expand("<afile>")), expand("<afile>"))', &filetype)
+  autocmd FilterWritePost <buffer> execute printf('call s:write_%s(expand("<afile>"), readfile(expand("<afile>")))', &filetype)
   autocmd TextChanged <buffer> call s:synchronize_names()
   execute join(map(items({'': ['r>'], 'i': ['<CR>', '>'], 'v': ['gU', 'gu']}), {_, item -> join(map(item[1], {_, sequence -> printf('%snoremap <buffer> %s <Nop>', item[0], sequence)}), "\n")}), "\n")
   execute join(map(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> [character, toupper(character)]}), {_, character -> printf("inoremap <buffer> %s %s\nnoremap <buffer> f%s f%s\nnoremap <buffer> r%s r%s", character[0], character[1], character[0], character[1], character[0], character[1])}), "\n")
@@ -70,6 +68,7 @@ function s:configure_sequences(type)
   setlocal nostartofline
   setlocal nowrap
   setlocal scrollbind
+  setlocal shelltemp
   syntax match Comment />.*$/ conceal
 endfunction
 
@@ -169,6 +168,7 @@ function s:original_path(path)
 endfunction
 
 function s:read_fasta(path)
+  let lines = []
   let prev_line = ''
   let s:build_line = {sequence, comment -> printf('%s>%s', toupper(substitute(sequence, '\*$', '', '')), comment)}
   for line in readfile(a:path)
@@ -176,7 +176,7 @@ function s:read_fasta(path)
       if line =~ '^[>;]'
         if line !~ '^;' || prev_line !~ '^[>;]'
           if exists('sequence')
-            call s:append_line(s:build_line(sequence, comment))
+            call add(lines, s:build_line(sequence, comment))
           endif
           let comment = substitute(line, '^[>;]\s*', '', '')
           let sequence = ''
@@ -188,26 +188,27 @@ function s:read_fasta(path)
     let prev_line = line
   endfor
   if exists('sequence')
-    call s:append_line(s:build_line(sequence, comment))
+    call add(lines, s:build_line(sequence, comment))
   endif
+  return lines
 endfunction
 
 function s:read_file(type, path)
   call win_gotoid(1000)
-  let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
-  silent %delete _
   if filereadable(a:path)
     try
-      execute printf('call s:read_%s(a:path)', a:type)
+      execute printf('let lines = s:read_%s(a:path)', a:type)
     catch
-      let error = 1
     endtry
   endif
-  let &l:undolevels = undo_levels
   call s:configure_sequences(a:type)
-  call s:update_names()
-  if exists('error') || len(filter(getline(1, '$'), {_, line -> s:comment_index(line) == -1})) && !s:buffer_empty()
+  if exists('lines')
+    let [undo_levels, &l:undolevels] = [&l:undolevels, -1]
     silent %delete _
+    call setline(1, lines)
+    let &l:undolevels = undo_levels
+    call s:update_names()
+  else
     echomsg printf('Error reading "%s"', s:original_path(a:path))
   endif
 endfunction
@@ -260,8 +261,9 @@ function s:update_status(status)
   call win_gotoid(id)
 endfunction
 
-function s:write_fasta(path)
-  for line in getline(1, '$')
+function s:write_fasta(path, lines)
+  call writefile([], a:path)
+  for line in a:lines
     call writefile([printf('>%s', s:extract_comment(line))], a:path, 'Sa')
     let sequence = s:extract_sequence(line)
     let range = len(sequence) ? range(0, len(sequence) - 1, 70) : [0]
@@ -274,8 +276,7 @@ endfunction
 function s:write_file(type, path)
   call win_gotoid(1000)
   let path = printf('%s~', a:path)
-  call writefile([], path)
-  execute printf('call s:write_%s(path)', a:type)
+  execute printf('call s:write_%s(path, getline(1, "$"))', a:type)
   call rename(path, a:path)
   if a:path ==# expand('%:p')
     setlocal nomodified
