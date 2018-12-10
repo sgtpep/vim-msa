@@ -249,10 +249,12 @@ endfunction
 function s:update_names()
   let names = map(getline(1, '$'), {_, line -> split(s:extract_comment(line), '', 1)[0]})
   let id = s:select_window(1001)
+  let view = winsaveview()
   setlocal modifiable
   call setline(1, names)
   silent! execute printf('%d,$delete _', len(names) + 1)
   setlocal nomodifiable
+  call winrestview(view)
   call win_gotoid(id)
 endfunction
 
