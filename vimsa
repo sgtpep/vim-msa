@@ -4,10 +4,6 @@
 # Copyright © 2018, Danil Semelenov, Stas Malavin.
 path=${TMPDIR-/tmp}/${0##*/}
 cat > "$path".vim << \EOF
-function s:buffer_empty()
-  return line('$') == 1 && getline(1) == ''
-endfunction
-
 function s:comment_index(...)
   return strridx(a:0 ? a:1 : getline('.'), '>')
 endfunction
