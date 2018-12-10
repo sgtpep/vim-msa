@@ -30,6 +30,12 @@ vimsa < /path/file.fasta
 
 To edit a comment to the sequence move the cursor to its line and press `gc`, edit the text in an opened split view and press `ZZ`.
 
+### Customization
+
+The best cursor is non-blinking block. Edit the settings of your terminal.
+
+\[Maybe provide examples later\]
+
 ## Features
 
 - Reads and writes files in [FASTA format](https://en.wikipedia.org/wiki/FASTA_format).
