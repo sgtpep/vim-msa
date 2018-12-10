@@ -22,8 +22,8 @@ function s:configure_comment(number)
 endfunction
 
 function s:configure_comments()
-  autocmd BufUnload <buffer> execute printf('%dwindo %d', win_id2win(1000), line('.'))
   autocmd BufWriteCmd <buffer> call s:update_comments(getline(1, '$'))
+  setlocal cursorbind
   setlocal nobuflisted
   setlocal nowrap
   setlocal scrollbind
@@ -32,6 +32,7 @@ function s:configure_comments()
 endfunction
 
 function s:configure_names()
+  setlocal cursorbind
   setlocal nobuflisted
   setlocal nomodifiable
   setlocal nowrap
@@ -65,6 +66,7 @@ function s:configure_sequences(type)
   setlocal buftype=acwrite
   setlocal concealcursor=cinv
   setlocal conceallevel=3
+  setlocal cursorbind
   setlocal ignorecase
   setlocal nostartofline
   setlocal nowrap
