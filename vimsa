@@ -13,8 +13,7 @@ function s:comment_index(...)
 endfunction
 
 function s:configure_comment(number)
-  autocmd BufWinLeave <buffer> call s:update_status('') | execute printf('%dwindo syncbind', win_id2win(1000))
-  call s:update_status('Comment')
+  autocmd BufLeave <buffer> execute printf('%dwindo syncbind', win_id2win(1000))
   execute printf('autocmd BufWriteCmd <buffer> call s:update_comment(%d, join(getline(1, "$"), " "))', a:number)
   resize 3
   setlocal nobuflisted
@@ -86,7 +85,7 @@ endfunction
 function s:edit_comment(number)
   let comment = s:extract_comment(getline(a:number))
   let view = winsaveview()
-  silent rightbelow split `=tempname()`
+  silent topleft split `=tempname()`
   call s:configure_comment(a:number)
   call setline(1, comment)
   let id = s:select_window(1000)
@@ -98,7 +97,7 @@ endfunction
 function s:edit_comments()
   let comments = map(getline(1, '$'), {_, line -> s:comment_index(line) == -1 ? '' : line[s:comment_index(line) + 1:]})
   let line = line('.')
-  silent rightbelow vsplit `=tempname()`
+  silent botright vsplit `=tempname()`
   call s:configure_comments()
   call setline(1, comments)
   execute line
@@ -257,12 +256,6 @@ function s:update_names()
   silent! execute printf('%d,$delete _', len(names) + 1)
   setlocal nomodifiable
   call winrestview(view)
-  call win_gotoid(id)
-endfunction
-
-function s:update_status(status)
-  let id = s:select_window(1000)
-  let &l:statusline = a:status
   call win_gotoid(id)
 endfunction
 
