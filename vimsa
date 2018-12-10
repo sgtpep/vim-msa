@@ -49,7 +49,7 @@ function s:configure_sequences(type)
   autocmd FilterWritePost <buffer> execute printf('call s:write_%s(expand("<afile>"), readfile(expand("<afile>")))', &filetype)
   autocmd TextChanged <buffer> call s:synchronize_names()
   execute join(map(items({'': ['r>'], 'i': ['<CR>', '>'], 'v': ['gU', 'gu']}), {_, item -> join(map(item[1], {_, sequence -> printf('%snoremap <buffer> %s <Nop>', item[0], sequence)}), "\n")}), "\n")
-  execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> substitute(substitute("inoremap <buffer> {c} {C}\nnoremap <buffer> f{c} f{C}\nnoremap <buffer> r{c} r{C}", '{c}', character, 'g'), '{C}', toupper(character), 'g')}), "\n")
+  execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> substitute(substitute("inoremap <buffer> {C} {c}\ninoremap <buffer> {c} {C}\nnoremap <buffer> f{c} f{C}\nnoremap <buffer> r{c} r{C}", '{c}', character, 'g'), '{C}', toupper(character), 'g')}), "\n")
   inoremap <buffer> <Space> -
   inoremap <buffer> <expr> <Del> getpos('.')[2] > <SID>comment_index() ? '' : '<Del>'
   let &l:filetype = a:type
