@@ -17,8 +17,8 @@ function s:configure_comment(number)
 endfunction
 
 function s:configure_comments()
+  autocmd BufUnload <buffer> execute printf('%dwindo %d', win_id2win(1000), line('.'))
   autocmd BufWriteCmd <buffer> call s:update_comments(getline(1, '$'))
-  setlocal cursorbind
   setlocal nobuflisted
   setlocal nowrap
   setlocal scrollbind
@@ -27,10 +27,10 @@ function s:configure_comments()
 endfunction
 
 function s:configure_names()
-  setlocal cursorbind
   setlocal cursorline
   setlocal nobuflisted
   setlocal nomodifiable
+  setlocal nowrap
   setlocal scrollbind
   setlocal statusline=Names
   setlocal winfixwidth
@@ -61,7 +61,6 @@ function s:configure_sequences(type)
   setlocal buftype=acwrite
   setlocal concealcursor=cinv
   setlocal conceallevel=3
-  setlocal cursorbind
   setlocal ignorecase
   setlocal nostartofline
   setlocal nowrap
@@ -244,7 +243,7 @@ function s:update_comments(comments)
 endfunction
 
 function s:update_names()
-  let names = map(getline(1, '$'), {_, line -> split(s:extract_comment(line), '', 1)[0][:9]})
+  let names = map(getline(1, '$'), {_, line -> split(s:extract_comment(line), '', 1)[0]})
   let id = s:select_window(1001)
   let view = winsaveview()
   setlocal modifiable
