@@ -293,7 +293,7 @@ EOF
 for command in vim nvim vim; do
   ! command -v "$command" > /dev/null || break
 done
-set -- "$command" --cmd 'let _ = printf("%s.vim", $path) | execute printf("source %s", fnameescape(_)) | call delete(_) | unlet _' "$@"
+set -- "$command" --cmd 'let path = printf("%s.vim", $path) | execute printf("source %s", fnameescape(path)) | call delete(path) | unlet path' "$@"
 if [ -t 0 ]; then
   path=$path exec "$@"
 else
