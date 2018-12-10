@@ -27,7 +27,6 @@ function s:configure_comments()
 endfunction
 
 function s:configure_names()
-  setlocal cursorline
   setlocal nobuflisted
   setlocal nomodifiable
   setlocal nowrap
