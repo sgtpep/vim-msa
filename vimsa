@@ -35,7 +35,6 @@ function s:configure_names()
   setlocal cursorbind
   setlocal nobuflisted
   setlocal nomodifiable
-  setlocal nowrap
   setlocal scrollbind
   setlocal statusline=Names
   setlocal winfixwidth
@@ -249,7 +248,7 @@ function s:update_comments(comments)
 endfunction
 
 function s:update_names()
-  let names = map(getline(1, '$'), {_, line -> split(s:extract_comment(line), '', 1)[0]})
+  let names = map(getline(1, '$'), {_, line -> split(s:extract_comment(line), '', 1)[0][:9]})
   let id = s:select_window(1001)
   let view = winsaveview()
   setlocal modifiable
