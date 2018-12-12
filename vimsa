@@ -10,6 +10,7 @@ endfunction
 
 function s:configure_comment(number)
   autocmd BufLeave <buffer> execute printf('%dwindo syncbind', win_id2win(1000))
+  call s:disable_mappings({'': ['O', 'o'], 'i': ['<CR>']})
   execute printf('autocmd BufWriteCmd <buffer> call s:update_comment(%d, join(getline(1, "$"), " "))', a:number)
   resize 3
   setlocal nobuflisted
@@ -19,6 +20,8 @@ endfunction
 function s:configure_comments()
   autocmd BufUnload <buffer> execute printf('%dwindo %d', win_id2win(1000), line('.'))
   autocmd BufWriteCmd <buffer> call s:update_comments(getline(1, '$'))
+  call s:disable_mappings({'': ['O', 'o'], 'i': ['<CR>']})
+  setlocal backspace-=eol
   setlocal nobuflisted
   setlocal nowrap
   setlocal scrollbind
