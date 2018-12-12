@@ -43,8 +43,8 @@ function s:configure_sequences(type)
   autocmd FilterReadPre <buffer> execute printf('call writefile(s:read_%s(expand("<afile>")), expand("<afile>"))', &filetype)
   autocmd FilterWritePost <buffer> execute printf('call s:write_%s(expand("<afile>"), readfile(expand("<afile>")))', &filetype)
   autocmd TextChanged <buffer> call s:synchronize_names()
+  call s:disable_mappings({'': ['r>'], 'i': ['<CR>', '>'], 'v': ['gU', 'gu']})
   execute join(map(['P', 'p'], {_, mapping -> printf('nnoremap <buffer> <silent> %s :<C-U>let column = getcurpos()[2] \| execute printf("normal! %%d%s%%d\|", v:count1, column) \| unlet column<CR>', mapping, mapping)}), "\n")
-  execute join(map(items({'': ['r>'], 'i': ['<CR>', '>'], 'v': ['gU', 'gu']}), {_, item -> join(map(item[1], {_, sequence -> printf('%snoremap <buffer> %s <Nop>', item[0], sequence)}), "\n")}), "\n")
   execute join(map(map(range(char2nr('a'), char2nr('z')), {_, number -> nr2char(number)}), {_, character -> substitute(substitute("inoremap <buffer> {C} {c}\ninoremap <buffer> {c} {C}\nnoremap <buffer> f{c} f{C}\nnoremap <buffer> r{c} r{C}", '{c}', character, 'g'), '{C}', toupper(character), 'g')}), "\n")
   inoremap <buffer> <Space> -
   inoremap <buffer> <expr> <Del> getpos('.')[2] > <SID>comment_index() ? '' : '<Del>'
@@ -74,6 +74,10 @@ function s:configure_vim()
   if &encoding == 'utf-8'
     set fillchars+=vert:│
   endif
+endfunction
+
+function s:disable_mappings(mappings)
+  execute join(map(items(a:mappings), {_, item -> join(map(item[1], {_, sequence -> printf('%snoremap <buffer> %s <Nop>', item[0], sequence)}), "\n")}), "\n")
 endfunction
 
 function s:edit_comment(number)
