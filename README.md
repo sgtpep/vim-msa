@@ -42,7 +42,7 @@ The recommended cursor is a non-blinking block. Edit the settings of your termin
 - `gC`: edit comments of all sequences line by line
 - `gc`: edit a comment of the sequence under cursor
 
-## License and copyright
+## License and Copyright
 
 The project is released under the General Public License (GPL), version 3.
 
